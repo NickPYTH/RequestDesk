@@ -1,0 +1,79 @@
+import {View, Text, TouchableOpacity} from "react-native";
+import {useEffect, useState} from "react";
+import {Camera} from "expo-camera";
+import Toast from "react-native-root-toast";
+
+export const CameraScreen = ({route, navigation}) => {
+    const { setImages, images, otherParam } = route.params;
+    const [counter, setCounter] = useState(images.length)
+    const [hasPermission, setHasPermission] = useState(null);
+    const [cameraRef, setCameraRef] = useState(null)
+    const [type, setType] = useState(Camera.Constants.Type.back);
+
+    useEffect(() => {
+        (async () => {
+            const { status } = await Camera.requestCameraPermissionsAsync();
+            setHasPermission(status === 'granted');
+        })();
+    }, []);
+    if (hasPermission === null) {
+        return <View />;
+    }
+    if (hasPermission === false) {
+        return <Text>No access to camera</Text>;
+    }
+    return (
+        <View style={{ flex: 1 }}>
+            <Camera style={{ flex: 1 }} type={type} ref={ref => {
+                setCameraRef(ref) ;
+            }}>
+                <View
+                    style={{
+                        flex: 1,
+                        backgroundColor: 'transparent',
+                        justifyContent: 'flex-end',
+                        marginBottom: 15
+                    }}>
+                    <TouchableOpacity style={{alignSelf: 'center'}} onPress={async() => {
+                        if(cameraRef){
+                            let photo = await cameraRef.takePictureAsync();
+                            console.log('photo', photo);
+                            Toast.show(`Добавлено ${counter+1} фото`, {
+                                duration: Toast.durations.LONG,
+                            });
+                            setCounter(prev=>prev+1)
+                            if (counter<7)
+                                setImages(prev=>{
+                                    return prev.concat(photo)
+                                })
+                            else
+                                Toast.show(`Больше добавить нельзя 😊, можете удалить предыдущие`, {
+                                    duration: Toast.durations.LONG,
+                                });
+                        }
+                    }}>
+                        <View style={{
+                            borderWidth: 2,
+                            borderRadius: 70,
+                            borderColor: 'white',
+                            height: 70,
+                            width:70,
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center'}}
+                        >
+                            <View style={{
+                                borderWidth: 2,
+                                borderRadius: 70,
+                                borderColor: 'white',
+                                height: 55,
+                                width:55,
+                                backgroundColor: 'white'}} >
+                            </View>
+                        </View>
+                    </TouchableOpacity>
+                </View>
+            </Camera>
+        </View>
+    );
+}
