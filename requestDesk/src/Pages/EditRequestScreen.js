@@ -16,12 +16,20 @@ const useInputState = (initialValue = "") => {
   return { value, onChangeText: setValue };
 };
 
-export const CreateRequestScreen = ({ navigation }) => {
+export const EditRequestScreen = ({
+  navigation,
+  title,
+  description,
+  gallery,
+}) => {
   const [images, setImages] = useState([]);
   const [visible, setVisible] = useState([false, null]);
-  const warningInputState = useInputState();
+  const titleState = useInputState(title);
+  const descriptionState = useInputState(description);
   const [selectedItem, setSelectedItem] = useState(null);
-
+  const saveHandler = () => {
+    navigation.goBack();
+  };
   return (
     <View style={styles.container}>
       <Modal visible={visible[0]}>
@@ -96,7 +104,7 @@ export const CreateRequestScreen = ({ navigation }) => {
         style={{ marginHorizontal: 15, marginVertical: 15 }}
         status="warning"
         placeholder="Тема заявки"
-        {...warningInputState}
+        {...titleState}
       />
       <Input
         style={{ marginHorizontal: 15, marginBottom: 15 }}
@@ -104,7 +112,7 @@ export const CreateRequestScreen = ({ navigation }) => {
         status="warning"
         textStyle={{ minHeight: 64 }}
         placeholder="Описание заявки"
-        {...warningInputState}
+        {...descriptionState}
       />
       <View
         style={{ ...styles.gallery, height: images.length > 3 ? 200 : 100 }}
@@ -142,8 +150,9 @@ export const CreateRequestScreen = ({ navigation }) => {
         style={{ marginHorizontal: 15, marginBottom: 15, marginTop: 15 }}
         appearance="outline"
         status="warning"
+        onPress={() => saveHandler()}
       >
-        Создать
+        Сохранить изменения
       </Button>
     </View>
   );
