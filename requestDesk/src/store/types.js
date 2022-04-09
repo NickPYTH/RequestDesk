@@ -1,0 +1,5 @@
+export const SET_IS_LOGIN = "SET_IS_LOGIN"
+export const FETCH_LOGIN = "FETCH_LOGIN"
+export const SET_IS_LOGIN_LOADING = "SET_IS_LOGIN_LOADING"
+export const SET_IS_CLIENT = "SET_IS_CLIENT"
+export const SET_IS_EXECUTOR = "SET_IS_EXECUTOR"
