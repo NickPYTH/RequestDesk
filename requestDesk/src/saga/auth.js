@@ -1,6 +1,7 @@
 import { call, put, takeEvery } from "redux-saga/effects";
 import {FETCH_LOGIN} from "../store/types";
-import {setIsClient, setIsExecutor, setIsLoginLoading} from "../store/actions";
+import {setIsClient, setIsExecutor, setIsLoginLoading, setUserInfo} from "../store/actions";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const fetchLogin = (phone, password) => {
@@ -26,6 +27,25 @@ function* loginWorker(info) {
             yield put(setIsClient(true))
         else if (json.user==="executor")
             yield put(setIsExecutor(true))
+        yield put(setUserInfo({
+            email: json.email,
+            phone: json.phone,
+            name: json.name,
+            surname: json.surname,
+            secondName: json.secondName
+        }))
+        const storeData = async (value) => {
+            try {
+                await AsyncStorage.setItem('name', json.name)
+                await AsyncStorage.setItem('surname', json.surname)
+                await AsyncStorage.setItem('secondName', json.secondName)
+                await AsyncStorage.setItem('email', json.email)
+                await AsyncStorage.setItem('phone', json.phone)
+            } catch (e) {
+                // saving error
+            }
+        }
+        storeData()
     }
     yield put(setIsLoginLoading(false))
 }

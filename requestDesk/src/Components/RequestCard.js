@@ -1,14 +1,7 @@
 import { Button, Card, Layout, Text } from "@ui-kitten/components";
 import { StyleSheet, View } from "react-native";
 
-const Header = (props) => (
-  <View {...props}>
-    <Text category="h6">Тема заявки</Text>
-    <Text category="s1">От 01.03.2022</Text>
-  </View>
-);
-
-export const RequestCard = ({ navigation }) => {
+export const RequestCard = ({ navigation, title, description }) => {
   const Footer = () => {
     return (
       <View style={[styles.footerContainer]}>
@@ -34,6 +27,12 @@ export const RequestCard = ({ navigation }) => {
       </View>
     );
   };
+  const Header = (props) => (
+        <View {...props}>
+            <Text category="h6">{title}</Text>
+            <Text category="s1">От 01.03.2022</Text>
+        </View>
+    );
   return (
     <Card
       navigation={navigation}
@@ -44,7 +43,7 @@ export const RequestCard = ({ navigation }) => {
     >
       <Layout>
         <Text style={{ maxHeight: 50 }}>
-          Описание заявкиаявки заявкизаявкиза явкизаявки заявки
+            {description}
         </Text>
       </Layout>
     </Card>

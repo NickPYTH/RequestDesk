@@ -1,11 +1,12 @@
 import {View} from "react-native";
 import {StyleSheet} from "react-native"
 import {Button, Card, Input, Layout, Spinner, Text} from "@ui-kitten/components";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
 import {NavigatorLayout} from "../Components/Navigator";
 import {fetchLogin} from "../store/actions";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const LoadingIndicator = (props) => (
     <View style={[props.style, styles.indicator]}>
@@ -19,22 +20,30 @@ const useInputState = (initialValue = '') => {
 };
 
 const EnterScreenLayout = ({navigation, info, fetchLogin}) => {
+    useEffect(()=>{
+        AsyncStorage.getItem('password').then(password=>{
+            AsyncStorage.getItem('phone').then(phone=>{
+                fetchLogin(phone, password)
+            })
+        })
+    },[])
+    AsyncStorage.getItem('dddsa').then((data)=>{console.log(data, 'good')}, ()=>{console.log('bad')})
     const loginState = useInputState()
     const passwordState = useInputState()
     const loginHandler = () => {
         fetchLogin(loginState.value, passwordState.value)
-        if (info.isClient)
-            navigation.reset({
-                index: 0,
-                routes: [{ name: 'ClientHome' }],
-            })
-        else if (info.isExecutor)
-            navigation.reset({
-                index: 0,
-                routes: [{ name: 'ExecutorHome' }],
-            })
+        AsyncStorage.setItem(password)
     }
-    console.log(navigation)
+    if (info.isClient && info.userInfo)
+        navigation.reset({
+            index: 0,
+            routes: [{ name: 'ClientHome' }],
+        })
+    else if (info.isExecutor && info.userInfo)
+        navigation.reset({
+            index: 0,
+            routes: [{ name: 'ExecutorHome' }],
+        })
     return (
         <Layout style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
             <Card style={{width: '90%'}}>
