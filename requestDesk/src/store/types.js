@@ -15,4 +15,4 @@ export const FETCH_GET_IMAGE = "FETCH_GET_IMAGE"
 export const SET_IMAGE_IDS = "SET_IMAGE_IDS"
 export const FETCH_CREATE_TASK = "FETCH_CREATE_TASK"
 export const SET_IS_CREATE_TASK_LOADING = "SET_IS_CREATE_TASK_LOADING"
-// set to null taskInfo: null, imagesIds: null,
+export const SET_REDIRECT_AFTER_CREATE = "SET_REDIRECT_AFTER_CREATE"

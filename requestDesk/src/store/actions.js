@@ -6,7 +6,7 @@ import {
     SET_IS_CLIENT, SET_IS_CREATE_TASK_LOADING,
     SET_IS_EXECUTOR, SET_IS_LOADING_TASK_INFO,
     SET_IS_LOGIN,
-    SET_IS_LOGIN_LOADING, SET_TASK_INFO, SET_USER_INFO
+    SET_IS_LOGIN_LOADING, SET_REDIRECT_AFTER_CREATE, SET_TASK_INFO, SET_USER_INFO
 } from "./types";
 
 export const setIsLoadingTaskInfo = (value) => ({
@@ -91,5 +91,10 @@ export const fetchCreateTask = (title, description, phone, email, object, equipm
 
 export const setCreateTaskLoading = (value) => ({
     type: SET_IS_CREATE_TASK_LOADING,
+    value
+})
+
+export const setRedirectAfterCreate = (value) => ({
+    type: SET_REDIRECT_AFTER_CREATE,
     value
 })

@@ -1,17 +1,17 @@
 import { call, put, takeEvery } from "redux-saga/effects";
 import {FETCH_CREATE_TASK} from "../store/types";
+import {setCreateTaskLoading, setRedirectAfterCreate} from "../store/actions";
 
 const fetchCreateTask = (title, description, phone, email, object, equipment, images) => {
     let formData = new FormData();
     formData.append("phone", phone);
     formData.append("email", email);
-
     formData.append("title", title);
     formData.append("description", description);
-    formData.append("object", 'equipment');
+    formData.append("equipment", equipment.title);
     images.map((image, id)=>{
         formData.append('file', {
-            name: `name${id}.jpg`,
+            name: `name${id+Math.random()}.jpg`,
             type: "image/jpeg",
             uri: image.uri,
         });
@@ -26,10 +26,10 @@ const fetchCreateTask = (title, description, phone, email, object, equipment, im
 };
 
 function* createTaskWorker(info) {
-    const data = yield call(fetchCreateTask, info.title, info.description, info.phone, info.email, info.object, info.equipment, info.images);
-    if (data.status===201){
-
-    }
+    yield put(setCreateTaskLoading(true))
+    yield call(fetchCreateTask, info.title, info.description, info.phone, info.email, info.object, info.equipment, info.images);
+    yield put(setCreateTaskLoading(false))
+    yield put(setRedirectAfterCreate(true))
 
 }
 

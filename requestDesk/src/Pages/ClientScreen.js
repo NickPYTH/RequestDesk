@@ -1,12 +1,11 @@
 import {Avatar, Button, Layout, Spinner} from "@ui-kitten/components";
 import {StyleSheet, TouchableOpacity, SafeAreaView, ScrollView} from "react-native";
 import { RequestCard } from "../Components/RequestCard";
-import {useNavigationState} from "@react-navigation/native";
 import logoutImg from "../../assets/logout.png";
 import refreshImg from "../../assets/refresh.png";
 import * as React from "react";
 import {bindActionCreators} from "redux";
-import {fetchGetClientTasks, logout} from "../store/actions";
+import {fetchGetClientTasks, logout, setRedirectAfterCreate} from "../store/actions";
 import {connect} from "react-redux";
 import {useEffect} from "react";
 
@@ -14,6 +13,7 @@ const ClientScreenLayout = ({ info, navigation, logout, fetchGetClientTasks }) =
     useEffect(()=>{
         fetchGetClientTasks(info.userInfo)
     }, [])
+
     navigation.setOptions(
         {headerRight: () => (
             <Layout>
@@ -78,7 +78,8 @@ const mapDispatchToProps = (dispatch) =>
     bindActionCreators(
         {
             logout,
-            fetchGetClientTasks
+            fetchGetClientTasks,
+            setRedirectAfterCreate
         },
         dispatch
     );

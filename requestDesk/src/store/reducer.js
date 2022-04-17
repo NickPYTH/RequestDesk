@@ -5,7 +5,7 @@ import {
     SET_IS_CLIENT, SET_IS_CREATE_TASK_LOADING,
     SET_IS_EXECUTOR, SET_IS_LOADING_TASK_INFO,
     SET_IS_LOGIN,
-    SET_IS_LOGIN_LOADING, SET_TASK_INFO,
+    SET_IS_LOGIN_LOADING, SET_REDIRECT_AFTER_CREATE, SET_TASK_INFO,
     SET_USER_INFO
 } from "./types";
 
@@ -20,11 +20,17 @@ const INITIAL_STATE = {
     isTaskInfoLoading: false,
     taskInfo: null,
     imagesIds: null,
-    isCreateTaskLoading: false
+    isCreateTaskLoading: false,
+    redirectAfterCreate: false,
 };
 
 export const reducer = (state = INITIAL_STATE, action) => {
     switch (action.type) {
+        case SET_REDIRECT_AFTER_CREATE:
+            return {
+                ...state,
+                redirectAfterCreate: action.value
+            }
         case SET_IS_CREATE_TASK_LOADING:
             return {
                 ...state,

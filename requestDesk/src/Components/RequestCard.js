@@ -17,12 +17,9 @@ export const RequestCard = ({ navigation, title, description, taskId }) => {
           style={styles.footerControl}
           size="small"
           status="warning"
-          onPress={() => navigation.push("EditRequest", { requestId: 123 })}
+          onPress={() => navigation.push("EditRequest", { taskId })}
         >
           Редактировать
-        </Button>
-        <Button style={styles.footerControl} size="small" status="danger">
-          Удалить
         </Button>
       </View>
     );
@@ -61,6 +58,7 @@ const styles = StyleSheet.create({
   },
   footerControl: {
     margin: 5,
+      width: '45%'
   },
   topContainer: {
     flexDirection: "row",

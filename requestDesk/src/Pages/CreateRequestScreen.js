@@ -1,25 +1,31 @@
 import {
-  Avatar,
-  Button,
-  Card,
-  Input,
-  Modal,
-  Text,
+    Avatar,
+    Button,
+    Card,
+    Input,
+    Modal, Spinner,
+    Text,
 } from "@ui-kitten/components";
 import { useState } from "react";
 import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import { AutocompleteDropdown } from "react-native-autocomplete-dropdown";
 import photo from "../../assets/photo.png";
 import {bindActionCreators} from "redux";
-import {fetchCreateTask, fetchGetClientTasks, logout} from "../store/actions";
+import {
+    fetchCreateTask,
+    fetchGetClientTasks,
+    setRedirectAfterCreate
+} from "../store/actions";
 import {connect} from "react-redux";
+import Toast from "react-native-root-toast";
+
 
 const useInputState = (initialValue = "") => {
   const [value, setValue] = useState(initialValue);
   return { value, onChangeText: setValue };
 };
 
-const CreateRequestScreenLayout = ({ info, navigation, fetchCreateTask }) => {
+const CreateRequestScreenLayout = ({ info, navigation, fetchCreateTask, setRedirectAfterCreate, fetchGetClientTasks }) => {
   const [images, setImages] = useState([]);
   const [visible, setVisible] = useState([false, null]);
   const title = useInputState();
@@ -40,6 +46,14 @@ const CreateRequestScreenLayout = ({ info, navigation, fetchCreateTask }) => {
             selectedItem,
             images,
         );
+    }
+    if (info.redirectAfterCreate) {
+        navigation.goBack()
+        setRedirectAfterCreate(false)
+        Toast.show(`Заявка создана`, {
+            duration: Toast.durations.LONG,
+        });
+        fetchGetClientTasks(info.userInfo)
     }
   return (
     <View style={styles.container}>
@@ -149,7 +163,7 @@ const CreateRequestScreenLayout = ({ info, navigation, fetchCreateTask }) => {
           <Avatar style={{ margin: 8 }} size="medium" source={photo} />
         </Button>
       </View>
-
+        {!info.isCreateTaskLoading ?
       <Button
         style={{ marginHorizontal: 15, marginBottom: 15, marginTop: 15 }}
         appearance="outline"
@@ -158,6 +172,13 @@ const CreateRequestScreenLayout = ({ info, navigation, fetchCreateTask }) => {
       >
         Создать
       </Button>
+            :
+            <View
+                style={{ marginHorizontal: 15, marginBottom: 15, marginTop: 15, flex:1, justifyContent: 'flex-start', alignItems: 'center' }}
+            >
+                <Spinner size='small' status='warning'/>
+            </View>
+        }
     </View>
   );
 };
@@ -165,7 +186,9 @@ const CreateRequestScreenLayout = ({ info, navigation, fetchCreateTask }) => {
 const mapDispatchToProps = (dispatch) =>
     bindActionCreators(
         {
-            fetchCreateTask
+            fetchCreateTask,
+            setRedirectAfterCreate,
+            fetchGetClientTasks
         },
         dispatch
     );
