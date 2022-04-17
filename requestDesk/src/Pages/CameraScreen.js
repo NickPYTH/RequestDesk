@@ -37,7 +37,6 @@ export const CameraScreen = ({route, navigation}) => {
                     <TouchableOpacity style={{alignSelf: 'center'}} onPress={async() => {
                         if(cameraRef){
                             let photo = await cameraRef.takePictureAsync();
-                            console.log('photo', photo);
                             Toast.show(`Добавлено ${counter+1} фото`, {
                                 duration: Toast.durations.LONG,
                             });

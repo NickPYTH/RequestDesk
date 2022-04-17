@@ -4,7 +4,7 @@ import {ExecutorScreen} from "../Pages/ExecutorScreen";
 import {TouchableOpacity} from "react-native";
 import {Avatar} from "@ui-kitten/components";
 import refresh from "../../assets/refresh.png";
-import {RequestScreen} from "../Pages/RequestScreen";
+import {ClientRequestScreen} from "../Pages/ClientRequestScreen";
 import {ClientScreen} from "../Pages/ClientScreen";
 import {CreateRequestScreen} from "../Pages/CreateRequestScreen";
 import {CameraScreen} from "../Pages/CameraScreen";
@@ -61,12 +61,11 @@ export const NavigatorLayout = ({info}) => {
                             fontWeight: "bold",
                         },
                         headerRight: () => (
-                            <TouchableOpacity onPress={() => console.log("kek")}>
+                            <TouchableOpacity>
                                 <Avatar
                                     style={{ margin: 8 }}
                                     size="medium"
                                     source={refresh}
-                                    onPress={() => console.log("kek")}
                                 />
                             </TouchableOpacity>
                         ),
@@ -74,7 +73,7 @@ export const NavigatorLayout = ({info}) => {
                 />
                 <Stack.Screen
                     name="Request"
-                    component={RequestScreen}
+                    component={ClientRequestScreen}
                     options={{
                         title: "Заявка",
                         headerStyle: {

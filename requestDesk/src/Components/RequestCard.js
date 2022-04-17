@@ -1,7 +1,7 @@
 import { Button, Card, Layout, Text } from "@ui-kitten/components";
 import { StyleSheet, View } from "react-native";
 
-export const RequestCard = ({ navigation, title, description }) => {
+export const RequestCard = ({ navigation, title, description, taskId }) => {
   const Footer = () => {
     return (
       <View style={[styles.footerContainer]}>
@@ -9,7 +9,7 @@ export const RequestCard = ({ navigation, title, description }) => {
           style={styles.footerControl}
           size="small"
           status="warning"
-          onPress={() => navigation.push("Request", { requestId: 123 })}
+          onPress={() => navigation.push("Request", { taskId })}
         >
           Просмотреть
         </Button>

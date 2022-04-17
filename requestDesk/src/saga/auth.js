@@ -32,7 +32,8 @@ function* loginWorker(info) {
             phone: json.phone,
             name: json.name,
             surname: json.surname,
-            secondName: json.secondName
+            secondName: json.secondName,
+            equipments: json.equipments,
         }))
         const storeData = async (value) => {
             try {

@@ -19,6 +19,8 @@ const fetchGetTasks = (phone, email) => {
 };
 
 function* getTasksWorker(info) {
+    yield put(setClientTaskList(null))
+    console.log('refresh')
     yield put(isTasksLoading(true))
     const data = yield call(fetchGetTasks, info.userInfo.phone, info.userInfo.email);
     if (data.status===200){

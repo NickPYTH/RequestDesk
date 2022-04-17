@@ -10,18 +10,37 @@ import { useState } from "react";
 import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import { AutocompleteDropdown } from "react-native-autocomplete-dropdown";
 import photo from "../../assets/photo.png";
+import {bindActionCreators} from "redux";
+import {fetchCreateTask, fetchGetClientTasks, logout} from "../store/actions";
+import {connect} from "react-redux";
 
 const useInputState = (initialValue = "") => {
   const [value, setValue] = useState(initialValue);
   return { value, onChangeText: setValue };
 };
 
-export const CreateRequestScreen = ({ navigation }) => {
+const CreateRequestScreenLayout = ({ info, navigation, fetchCreateTask }) => {
   const [images, setImages] = useState([]);
   const [visible, setVisible] = useState([false, null]);
-  const warningInputState = useInputState();
+  const title = useInputState();
+    const description = useInputState();
   const [selectedItem, setSelectedItem] = useState(null);
-
+  let equipments = []
+    if (info.userInfo)
+      info.userInfo.equipments.map((eq, id)=>{
+          equipments.push({id, title: eq.name + ' ' + eq.description})
+      })
+    const createHandler = () => {
+        fetchCreateTask(
+            title.value,
+            description.value,
+            info.userInfo.phone,
+            info.userInfo.email,
+            info.userInfo.object,
+            selectedItem,
+            images,
+        );
+    }
   return (
     <View style={styles.container}>
       <Modal visible={visible[0]}>
@@ -52,14 +71,7 @@ export const CreateRequestScreen = ({ navigation }) => {
         closeOnSubmit={false}
         initialValue={{ id: "2" }} // or just '2'
         onSelectItem={setSelectedItem}
-        dataSet={[
-          { id: "1", title: 'УСС "Факед' },
-          { id: "2", title: "Администрация" },
-          { id: "3", title: "Столовая №1" },
-          { id: "5", title: "Сургутское ЛПУМГ Столовая №4" },
-          { id: "6", title: "Сургутское ЛПУМГ Столовая №7" },
-          { id: "7", title: "Губкинское ЛПУ" },
-        ]}
+        dataSet={equipments}
         textInputProps={{
           placeholder: "Начните вводить название объекта",
           autoCorrect: false,
@@ -96,7 +108,7 @@ export const CreateRequestScreen = ({ navigation }) => {
         style={{ marginHorizontal: 15, marginVertical: 15 }}
         status="warning"
         placeholder="Тема заявки"
-        {...warningInputState}
+        {...title}
       />
       <Input
         style={{ marginHorizontal: 15, marginBottom: 15 }}
@@ -104,7 +116,7 @@ export const CreateRequestScreen = ({ navigation }) => {
         status="warning"
         textStyle={{ minHeight: 64 }}
         placeholder="Описание заявки"
-        {...warningInputState}
+        {...description}
       />
       <View
         style={{ ...styles.gallery, height: images.length > 3 ? 200 : 100 }}
@@ -142,12 +154,31 @@ export const CreateRequestScreen = ({ navigation }) => {
         style={{ marginHorizontal: 15, marginBottom: 15, marginTop: 15 }}
         appearance="outline"
         status="warning"
+        onPress={()=>createHandler()}
       >
         Создать
       </Button>
     </View>
   );
 };
+
+const mapDispatchToProps = (dispatch) =>
+    bindActionCreators(
+        {
+            fetchCreateTask
+        },
+        dispatch
+    );
+
+const mapStateToProps = (state) => {
+    const info = state.reducer;
+    return { info };
+};
+
+export const CreateRequestScreen = connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(CreateRequestScreenLayout);
 
 const styles = StyleSheet.create({
   container: {

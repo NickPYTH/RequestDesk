@@ -4,7 +4,6 @@ import {Button, Card, Input, Layout, Spinner, Text} from "@ui-kitten/components"
 import {useEffect, useState} from "react";
 import {bindActionCreators} from "redux";
 import {connect} from "react-redux";
-import {NavigatorLayout} from "../Components/Navigator";
 import {fetchLogin} from "../store/actions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -21,18 +20,18 @@ const useInputState = (initialValue = '') => {
 
 const EnterScreenLayout = ({navigation, info, fetchLogin}) => {
     useEffect(()=>{
+        fetchLogin('123456782', 'Kolia27062000')
         AsyncStorage.getItem('password').then(password=>{
             AsyncStorage.getItem('phone').then(phone=>{
                 fetchLogin(phone, password)
             })
         })
     },[])
-    AsyncStorage.getItem('dddsa').then((data)=>{console.log(data, 'good')}, ()=>{console.log('bad')})
     const loginState = useInputState()
     const passwordState = useInputState()
     const loginHandler = () => {
         fetchLogin(loginState.value, passwordState.value)
-        AsyncStorage.setItem(password)
+        AsyncStorage.setItem(passwordState.value)
     }
     if (info.isClient && info.userInfo)
         navigation.reset({

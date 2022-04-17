@@ -1,63 +1,76 @@
-import {Avatar, Button} from "@ui-kitten/components";
-import {StyleSheet, TouchableOpacity, View} from "react-native";
+import {Avatar, Button, Layout, Spinner} from "@ui-kitten/components";
+import {StyleSheet, TouchableOpacity, SafeAreaView, ScrollView} from "react-native";
 import { RequestCard } from "../Components/RequestCard";
 import {useNavigationState} from "@react-navigation/native";
 import logoutImg from "../../assets/logout.png";
+import refreshImg from "../../assets/refresh.png";
 import * as React from "react";
 import {bindActionCreators} from "redux";
 import {fetchGetClientTasks, logout} from "../store/actions";
 import {connect} from "react-redux";
 import {useEffect} from "react";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ClientScreenLayout = ({ info, navigation, logout, fetchGetClientTasks }) => {
-    //const index = useNavigationState(state => state.index);
-    console.log(info)
     useEffect(()=>{
         fetchGetClientTasks(info.userInfo)
     }, [])
     navigation.setOptions(
         {headerRight: () => (
-                <TouchableOpacity onPress={() => {
-                    logout()
-                    navigation.reset({
-                        index: 0,
-                        routes: [{name: 'Home'}],
-                    })
-                }}>
-                    <Avatar
-                        style={{ margin: 8, width: 30, height: 30 }}
-                        size="medium"
-                        source={logoutImg}
-                    />
-                </TouchableOpacity>
+            <Layout>
+                <Layout style={{flex: 1, flexDirection:'row', backgroundColor: '#FFCD07'}} >
+                    <TouchableOpacity
+                        style={{ margin: 8, width: 30, height: 30, marginBottom: 25, marginRight: 15 }}
+                        onPress={() => {
+                            fetchGetClientTasks(info.userInfo)
+                        }}
+                    >
+                        <Avatar
+                            style={{ margin: 8, width: 30, height: 30 }}
+                            size="medium"
+                            source={refreshImg}
+                        />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={{ margin: 8, width: 30, height: 30}}
+                        onPress={() => {
+                            logout()
+                            navigation.reset({
+                                index: 0,
+                                routes: [{name: 'Home'}],
+                            })
+                        }}
+                    >
+                        <Avatar
+                            style={{ margin: 8, width: 30, height: 30 }}
+                            size="medium"
+                            source={logoutImg}
+                        />
+                    </TouchableOpacity>
+                </Layout>
+            </Layout>
             ),}
     )
-    console.log(info)
   return (
-    <View>
-        {info.clientTasks && info.clientTasks.map((task)=>{
-            return(
-                <RequestCard key={task.id} title={task.title} description={task.description} navigation={navigation} />
-            )
-        })}
-
-        {info.isTasksLoading && (<Button
-            style={styles.button}
-            appearance="outline"
-            status="warning"
-            onPress={() => navigation.push("CreateRequest")}
-        >Lol</Button>)}
-
-      <Button
-        style={styles.button}
-        appearance="outline"
-        status="warning"
-        onPress={() => navigation.push("CreateRequest")}
-      >
-        Создать заявку
-      </Button>
-    </View>
+      <SafeAreaView style={styles.container}>
+          {info.isTasksLoading ? (<Spinner status="warning"/>) :
+              <ScrollView showsVerticalScrollIndicator={false}>
+                  <Button
+                      style={styles.button}
+                      appearance="outline"
+                      status="warning"
+                      onPress={() => navigation.push("CreateRequest")}
+                  >
+                      Создать заявку
+                  </Button>
+                  {info.clientTasks && info.clientTasks.map((task) => {
+                      return (
+                          <RequestCard key={task.id} taskId={task.id-1} title={task.title} description={task.description}
+                                       navigation={navigation}/>
+                      )
+                  })}
+              </ScrollView>
+          }
+      </SafeAreaView>
   );
 };
 
@@ -82,7 +95,12 @@ export const ClientScreen = connect(
 
 const styles = StyleSheet.create({
   button: {
-    marginVertical: 15,
+    marginTop: 14,
     marginHorizontal: "28%",
   },
+    container: {
+      flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center'
+    }
 });
