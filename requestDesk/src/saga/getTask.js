@@ -1,8 +1,6 @@
 import { call, put, takeEvery } from "redux-saga/effects";
-import { FETCH_GET_TASK_INFO} from "../store/types";
-import {
-    setIsLoadingTaskInfo, setTaskInfo,
-} from "../store/actions";
+import { FETCH_GET_TASK_INFO } from "../store/types";
+import { setIsLoadingTaskInfo, setTaskInfo } from "../store/actions";
 
 const fetchGetTask = (phone, email, taskId) => {
     let formData = new FormData();
@@ -11,24 +9,26 @@ const fetchGetTask = (phone, email, taskId) => {
     formData.append("id", taskId);
 
     let requestOptions = {
-        method: 'POST',
+        method: "POST",
         body: formData,
-        redirect: 'follow'
+        redirect: "follow",
     };
 
-    return fetch("http://176.57.217.201:9798/api/accounts/get-task", requestOptions)
+    return fetch(
+        "http://192.168.0.191:8000/api/accounts/get-task",
+        requestOptions
+    );
 };
 
 function* getTaskWorker(info) {
-    yield put(setTaskInfo(null))
-    yield put(setIsLoadingTaskInfo(true))
+    yield put(setTaskInfo(null));
+    yield put(setIsLoadingTaskInfo(true));
     const data = yield call(fetchGetTask, info.phone, info.email, info.taskId);
-    console.log("here", data)
-    if (data.status===200){
+    if (data.status === 200) {
         const json = yield call(() => new Promise((res) => res(data.json())));
-        yield put(setTaskInfo(json))
+        yield put(setTaskInfo(json));
     }
-    yield put(setIsLoadingTaskInfo(false))
+    yield put(setIsLoadingTaskInfo(false));
 }
 
 export function* getTaskWatcher() {

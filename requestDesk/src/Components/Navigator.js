@@ -1,23 +1,23 @@
-import {EditRequestScreen} from "../Pages/EditRequestScreen";
-import {EnterScreen} from "../Pages/EnterScreen";
-import {ExecutorScreen} from "../Pages/ExecutorScreen";
-import {TouchableOpacity} from "react-native";
-import {Avatar} from "@ui-kitten/components";
+import { EditRequestScreen } from "../Pages/EditRequestScreen";
+import { EnterScreen } from "../Pages/EnterScreen";
+import { ExecutorScreen } from "../Pages/ExecutorScreen";
+import { TouchableOpacity } from "react-native";
+import { Avatar } from "@ui-kitten/components";
 import refresh from "../../assets/refresh.png";
-import {ClientRequestScreen} from "../Pages/ClientRequestScreen";
-import {ClientScreen} from "../Pages/ClientScreen";
-import {CreateRequestScreen} from "../Pages/CreateRequestScreen";
-import {CameraScreen} from "../Pages/CameraScreen";
+import { ClientRequestScreen } from "../Pages/ClientRequestScreen";
+import { ClientScreen } from "../Pages/ClientScreen";
+import { CreateRequestScreen } from "../Pages/CreateRequestScreen";
+import { CameraScreen } from "../Pages/CameraScreen";
 import * as React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import {connect} from "react-redux";
-import {bindActionCreators} from "redux";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
 
 const Stack = createNativeStackNavigator();
 
-export const NavigatorLayout = ({info}) => {
-    return(
+export const NavigatorLayout = ({ info }) => {
+    return (
         <NavigationContainer>
             <Stack.Navigator initialRouteName="Home">
                 <Stack.Screen
@@ -129,16 +129,10 @@ export const NavigatorLayout = ({info}) => {
                 />
             </Stack.Navigator>
         </NavigationContainer>
-        )
-}
-
-const mapDispatchToProps = (dispatch) =>
-    bindActionCreators(
-        {
-
-        },
-        dispatch
     );
+};
+
+const mapDispatchToProps = (dispatch) => bindActionCreators({}, dispatch);
 
 const mapStateToProps = (state) => {
     const info = state.reducer;

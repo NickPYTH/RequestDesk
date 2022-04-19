@@ -2,61 +2,101 @@ import {
     Avatar,
     Button,
     Card,
-    Input, Layout,
-    Modal, Spinner,
+    Input,
+    Layout,
+    Modal,
+    Spinner,
     Text,
 } from "@ui-kitten/components";
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import { AutocompleteDropdown } from "react-native-autocomplete-dropdown";
 import photo from "../../assets/photo.png";
-import {bindActionCreators} from "redux";
-import {fetchGetImage, fetchGetTaskInfo} from "../store/actions";
-import {connect} from "react-redux";
+import { bindActionCreators } from "redux";
+import { fetchGetImage, fetchGetTaskInfo } from "../store/actions";
+import { connect } from "react-redux";
 import * as React from "react";
 
 const useInputState = (initialValue = "") => {
-  const [value, setValue] = useState(initialValue);
-  return { value, onChangeText: setValue };
+    const [value, setValue] = useState(initialValue);
+    return { value, onChangeText: setValue };
 };
 
-const EditRequestScreenLayout = ({info, route, navigation, fetchGetTaskInfo, fetchGetImage}) => {
-  const [images, setImages] = useState([]);
-  const [visible, setVisible] = useState([false, null]);
-  const titleState = useInputState(null);
-  const descriptionState = useInputState(null);
-  const [selectedItem, setSelectedItem] = useState(null);
-  const [loading, setLoading] = useState(true)
-  const saveHandler = () => {
-    navigation.goBack();
-  };
-    useEffect(()=>{
+const EditRequestScreenLayout = ({
+    info,
+    route,
+    navigation,
+    fetchGetTaskInfo,
+    fetchGetImage,
+}) => {
+    useEffect(() => {
         const { taskId, otherParam } = route.params;
-        fetchGetTaskInfo(info.userInfo.phone, info.userInfo.email, taskId)
-        setLoading(false)
-    }, [])
-    if (loading && !info.taskInfo )
-        return(<Layout style={{flex: 1, marginVertical: 50, backgroundColor:'#f1f1f1', justifyContent: 'center', alignItems:'center'}}><Spinner status="warning"/></Layout>)
-    else {
+        fetchGetTaskInfo(info.userInfo.phone, info.userInfo.email, taskId);
+    }, []);
+    const [images, setImages] = useState([]);
+    const [isFirst, setIsFirst] = useState(false);
+    const [visible, setVisible] = useState([false, null]);
+    const [selectedItem, setSelectedItem] = useState(null);
+    const [equipments, setEquipments] = useState([]);
+    const titleState = useInputState(null);
+    const descriptionState = useInputState(null);
+    const saveHandler = () => {
+        console.log(titleState.value, descriptionState.value, selectedItem.title)
+        navigation.goBack();
+    };
+    if (info.taskInfo !== null && isFirst === false) {
+        setIsFirst(true);
+        info.userInfo.equipments.map((eq, id) => {
+            setEquipments((prev) =>
+                prev.concat({
+                    id: String(id),
+                    title: eq.name + " " + eq.description,
+                })
+            );
+        });
+        titleState.onChangeText(info.taskInfo.info);
+        descriptionState.onChangeText(info.taskInfo.description);
+    }
+    if (info.isTaskInfoLoading || info.taskInfo === null) {
+        return (
+            <Layout
+                style={{
+                    flex: 1,
+                    marginVertical: 50,
+                    backgroundColor: "#f1f1f1",
+                    justifyContent: "center",
+                    alignItems: "center",
+                }}
+            >
+                <Spinner status="warning" />
+            </Layout>
+        );
+    } else {
         return (
             <View style={styles.container}>
                 <Modal visible={visible[0]}>
                     <Card>
-                        <Text category="h6" style={{marginBottom: 15}}>
+                        <Text category="h6" style={{ marginBottom: 15 }}>
                             Удалить фотографию?
                         </Text>
                         <Button
                             onPress={() => {
                                 setImages((prev) =>
-                                    prev.filter((image, imageId) => imageId !== visible[1])
+                                    prev.filter(
+                                        (image, imageId) =>
+                                            imageId !== visible[1]
+                                    )
                                 );
                                 setVisible([false, null]);
                             }}
-                            style={{marginBottom: 15}}
+                            style={{ marginBottom: 15 }}
                         >
                             Да
                         </Button>
-                        <Button status="danger" onPress={() => setVisible([false, null])}>
+                        <Button
+                            status="danger"
+                            onPress={() => setVisible([false, null])}
+                        >
                             Отмена
                         </Button>
                     </Card>
@@ -66,18 +106,17 @@ const EditRequestScreenLayout = ({info, route, navigation, fetchGetTaskInfo, fet
                     clearOnFocus={false}
                     closeOnBlur={true}
                     closeOnSubmit={false}
-                    initialValue={{id: "2"}} // or just '2'
+                    initialValue={equipments.find((item) => {
+                        if (
+                            item.title.split(" ")[0] ===
+                            info.taskInfo.equipment.split(" ")[0]
+                        )
+                            return item.id;
+                    })}
                     onSelectItem={setSelectedItem}
-                    dataSet={[
-                        {id: "1", title: 'УСС "Факед'},
-                        {id: "2", title: "Администрация"},
-                        {id: "3", title: "Столовая №1"},
-                        {id: "5", title: "Сургутское ЛПУМГ Столовая №4"},
-                        {id: "6", title: "Сургутское ЛПУМГ Столовая №7"},
-                        {id: "7", title: "Губкинское ЛПУ"},
-                    ]}
+                    dataSet={equipments}
                     textInputProps={{
-                        placeholder: "Начните вводить название объекта",
+                        placeholder: "Название оборудования",
                         autoCorrect: false,
                         autoCapitalize: "none",
                         style: {
@@ -109,24 +148,26 @@ const EditRequestScreenLayout = ({info, route, navigation, fetchGetTaskInfo, fet
                     }}
                 />
                 <Input
-                    style={{marginHorizontal: 15, marginVertical: 15}}
+                    style={{ marginHorizontal: 15, marginVertical: 15 }}
                     status="warning"
                     placeholder={info.taskInfo && info.taskInfo.info}
                     {...titleState}
                 />
                 <Input
-                    style={{marginHorizontal: 15, marginBottom: 15}}
+                    style={{ marginHorizontal: 15, marginBottom: 15 }}
                     multiline={true}
                     status="warning"
-                    textStyle={{minHeight: 64}}
+                    textStyle={{ minHeight: 64 }}
                     placeholder={info.taskInfo && info.taskInfo.description}
                     {...descriptionState}
                 />
                 <View
-                    style={{...styles.gallery, height: images.length > 3 ? 200 : 100}}
+                    style={{
+                        ...styles.gallery,
+                        height: images.length > 3 ? 200 : 100,
+                    }}
                 >
-                    {images.map((image, id) => {
-                        if (image !== undefined)
+                    {info.taskInfo.images_ids.map((id) => {
                             return (
                                 <TouchableOpacity
                                     key={id}
@@ -138,24 +179,58 @@ const EditRequestScreenLayout = ({info, route, navigation, fetchGetTaskInfo, fet
                                     <Image
                                         style={styles.tinyLogo}
                                         source={{
-                                            uri: image.uri,
+                                            uri: `http://192.168.0.191:8000/api/accounts/get-image-by-id?id=${id}`,
                                         }}
                                     />
                                 </TouchableOpacity>
                             );
                     })}
+                    {images.map((image, id) => {
+                        if (image)
+                        return (
+                            <TouchableOpacity
+                                key={id}
+                                onLongPress={() => {
+                                    setVisible([true, id]);
+                                }}
+                                activeOpacity={0.8}
+                            >
+                                <Image
+                                    style={styles.tinyLogo}
+                                    source={{
+                                        uri: image.uri,
+                                    }}
+                                />
+                            </TouchableOpacity>
+                        );
+                    })}
                     <Button
-                        style={{height: 80, width: 80, marginLeft: 5, borderRadius: 15}}
+                        style={{
+                            height: 80,
+                            width: 80,
+                            marginLeft: 5,
+                            borderRadius: 15,
+                        }}
                         appearance="outline"
                         status="warning"
-                        onPress={() => navigation.push("Camera", {images, setImages})}
+                        onPress={() =>
+                            navigation.push("Camera", { images, setImages })
+                        }
                     >
-                        <Avatar style={{margin: 8}} size="medium" source={photo}/>
+                        <Avatar
+                            style={{ margin: 8 }}
+                            size="medium"
+                            source={photo}
+                        />
                     </Button>
                 </View>
 
                 <Button
-                    style={{marginHorizontal: 15, marginBottom: 15, marginTop: 15}}
+                    style={{
+                        marginHorizontal: 15,
+                        marginBottom: 15,
+                        marginTop: 15,
+                    }}
                     appearance="outline"
                     status="warning"
                     onPress={() => saveHandler()}
@@ -171,7 +246,7 @@ const mapDispatchToProps = (dispatch) =>
     bindActionCreators(
         {
             fetchGetTaskInfo,
-            fetchGetImage
+            fetchGetImage,
         },
         dispatch
     );
@@ -187,26 +262,26 @@ export const EditRequestScreen = connect(
 )(EditRequestScreenLayout);
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  tinyLogo: {
-    width: 80,
-    height: 80,
-    borderRadius: 15,
-    marginLeft: 5,
-    marginBottom: 15,
-  },
-  gallery: {
-    display: "flex",
-    flexDirection: "row",
-    height: 100,
-    borderColor: "#ffaa00",
-    borderWidth: 1,
-    marginHorizontal: 15,
-    borderRadius: 5,
-    padding: 9,
-    marginBottom: 15,
-    flexWrap: "wrap",
-  },
+    container: {
+        flex: 1,
+    },
+    tinyLogo: {
+        width: 80,
+        height: 80,
+        borderRadius: 15,
+        marginLeft: 5,
+        marginBottom: 15,
+    },
+    gallery: {
+        display: "flex",
+        flexDirection: "row",
+        height: 100,
+        borderColor: "#ffaa00",
+        borderWidth: 1,
+        marginHorizontal: 15,
+        borderRadius: 5,
+        padding: 9,
+        marginBottom: 15,
+        flexWrap: "wrap",
+    },
 });

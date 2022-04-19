@@ -1,27 +1,54 @@
-import {Avatar, Button, Layout, Spinner} from "@ui-kitten/components";
-import {StyleSheet, TouchableOpacity, SafeAreaView, ScrollView} from "react-native";
+import { Avatar, Button, Layout, Spinner } from "@ui-kitten/components";
+import {
+    StyleSheet,
+    TouchableOpacity,
+    SafeAreaView,
+    ScrollView,
+} from "react-native";
 import { RequestCard } from "../Components/RequestCard";
 import logoutImg from "../../assets/logout.png";
 import refreshImg from "../../assets/refresh.png";
 import * as React from "react";
-import {bindActionCreators} from "redux";
-import {fetchGetClientTasks, logout, setRedirectAfterCreate} from "../store/actions";
-import {connect} from "react-redux";
-import {useEffect} from "react";
+import { bindActionCreators } from "redux";
+import {
+    fetchGetClientTasks,
+    logout,
+    setRedirectAfterCreate, setTaskInfo,
+} from "../store/actions";
+import { connect } from "react-redux";
+import { useEffect } from "react";
 
-const ClientScreenLayout = ({ info, navigation, logout, fetchGetClientTasks }) => {
-    useEffect(()=>{
-        fetchGetClientTasks(info.userInfo)
-    }, [])
+const ClientScreenLayout = ({
+    info,
+    navigation,
+    logout,
+    fetchGetClientTasks,
+                                setTaskInfo
+}) => {
+    useEffect(() => {
+        fetchGetClientTasks(info.userInfo);
+    }, []);
 
-    navigation.setOptions(
-        {headerRight: () => (
+    navigation.setOptions({
+        headerRight: () => (
             <Layout>
-                <Layout style={{flex: 1, flexDirection:'row', backgroundColor: '#FFCD07'}} >
+                <Layout
+                    style={{
+                        flex: 1,
+                        flexDirection: "row",
+                        backgroundColor: "#FFCD07",
+                    }}
+                >
                     <TouchableOpacity
-                        style={{ margin: 8, width: 30, height: 30, marginBottom: 25, marginRight: 15 }}
+                        style={{
+                            margin: 8,
+                            width: 30,
+                            height: 30,
+                            marginBottom: 25,
+                            marginRight: 15,
+                        }}
                         onPress={() => {
-                            fetchGetClientTasks(info.userInfo)
+                            fetchGetClientTasks(info.userInfo);
                         }}
                     >
                         <Avatar
@@ -31,13 +58,13 @@ const ClientScreenLayout = ({ info, navigation, logout, fetchGetClientTasks }) =
                         />
                     </TouchableOpacity>
                     <TouchableOpacity
-                        style={{ margin: 8, width: 30, height: 30}}
+                        style={{ margin: 8, width: 30, height: 30 }}
                         onPress={() => {
-                            logout()
+                            logout();
                             navigation.reset({
                                 index: 0,
-                                routes: [{name: 'Home'}],
-                            })
+                                routes: [{ name: "Home" }],
+                            });
                         }}
                     >
                         <Avatar
@@ -48,30 +75,39 @@ const ClientScreenLayout = ({ info, navigation, logout, fetchGetClientTasks }) =
                     </TouchableOpacity>
                 </Layout>
             </Layout>
-            ),}
-    )
-  return (
-      <SafeAreaView style={styles.container}>
-          {info.isTasksLoading ? (<Spinner status="warning"/>) :
-              <ScrollView showsVerticalScrollIndicator={false}>
-                  <Button
-                      style={styles.button}
-                      appearance="outline"
-                      status="warning"
-                      onPress={() => navigation.push("CreateRequest")}
-                  >
-                      Создать заявку
-                  </Button>
-                  {info.clientTasks && info.clientTasks.map((task) => {
-                      return (
-                          <RequestCard key={task.id} taskId={task.id-1} title={task.title} description={task.description}
-                                       navigation={navigation}/>
-                      )
-                  })}
-              </ScrollView>
-          }
-      </SafeAreaView>
-  );
+        ),
+    });
+    return (
+        <SafeAreaView style={styles.container}>
+            {info.isTasksLoading ? (
+                <Spinner status="warning" />
+            ) : (
+                <ScrollView showsVerticalScrollIndicator={false}>
+                    <Button
+                        style={styles.button}
+                        appearance="outline"
+                        status="warning"
+                        onPress={() => navigation.push("CreateRequest")}
+                    >
+                        Создать заявку
+                    </Button>
+                    {info.clientTasks &&
+                        info.clientTasks.map((task) => {
+                            return (
+                                <RequestCard
+                                    key={task.id}
+                                    taskId={task.id}
+                                    title={task.title}
+                                    description={task.description}
+                                    navigation={navigation}
+                                    setTaskInfo={setTaskInfo}
+                                />
+                            );
+                        })}
+                </ScrollView>
+            )}
+        </SafeAreaView>
+    );
 };
 
 const mapDispatchToProps = (dispatch) =>
@@ -79,7 +115,8 @@ const mapDispatchToProps = (dispatch) =>
         {
             logout,
             fetchGetClientTasks,
-            setRedirectAfterCreate
+            setRedirectAfterCreate,
+            setTaskInfo
         },
         dispatch
     );
@@ -95,13 +132,13 @@ export const ClientScreen = connect(
 )(ClientScreenLayout);
 
 const styles = StyleSheet.create({
-  button: {
-    marginTop: 14,
-    marginHorizontal: "28%",
-  },
+    button: {
+        marginTop: 14,
+        marginHorizontal: "28%",
+    },
     container: {
-      flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center'
-    }
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+    },
 });
