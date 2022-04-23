@@ -15,7 +15,7 @@ const fetchGetTask = (phone, email, taskId) => {
     };
 
     return fetch(
-        "http://192.168.0.191:8000/api/accounts/get-task",
+        "http://192.168.43.23:8000/api/accounts/get-task",
         requestOptions
     );
 };

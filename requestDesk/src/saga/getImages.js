@@ -7,7 +7,7 @@ const fetchGetImage = (id) => {
         redirect: "follow",
     };
     return fetch(
-        `http://192.168.0.191:8000/api/accounts/get-image-by-id?id=${id}`,
+        `http://192.168.43.23:8000/api/accounts/get-image-by-id?id=${id}`,
         requestOptions
     );
 };

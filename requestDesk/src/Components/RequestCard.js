@@ -1,6 +1,5 @@
 import { Button, Card, Layout, Text } from "@ui-kitten/components";
 import { StyleSheet, View } from "react-native";
-import {setTaskInfo} from "../store/actions";
 
 export const RequestCard = ({ navigation, title, description, taskId, setTaskInfo }) => {
     const Footer = () => {

@@ -16,6 +16,7 @@ import { bindActionCreators } from "redux";
 import { fetchGetImage, fetchGetTaskInfo } from "../store/actions";
 import { connect } from "react-redux";
 import * as React from "react";
+import Toast from "react-native-root-toast";
 
 const useInputState = (initialValue = "") => {
     const [value, setValue] = useState(initialValue);
@@ -42,7 +43,15 @@ const EditRequestScreenLayout = ({
     const descriptionState = useInputState(null);
     const saveHandler = () => {
         console.log(titleState.value, descriptionState.value, selectedItem.title)
-        navigation.goBack();
+        if (titleState.value.trim() || titleState.value.trim() < 300)
+            Toast.show(
+                `Пустой заголовок заявки`,
+                {
+                    duration: Toast.durations.SHORT,
+                }
+            );
+
+        //navigation.goBack();
     };
     if (info.taskInfo !== null && isFirst === false) {
         setIsFirst(true);
@@ -179,7 +188,7 @@ const EditRequestScreenLayout = ({
                                     <Image
                                         style={styles.tinyLogo}
                                         source={{
-                                            uri: `http://192.168.0.191:8000/api/accounts/get-image-by-id?id=${id}`,
+                                            uri: `http://192.168.43.23:8000/api/accounts/get-image-by-id?id=${id}`,
                                         }}
                                     />
                                 </TouchableOpacity>

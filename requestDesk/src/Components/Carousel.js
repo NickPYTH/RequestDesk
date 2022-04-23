@@ -15,7 +15,7 @@ export const Carousel = ({ ids }) => {
     ids.map((id) => {
         images.push({
             source: {
-                uri: `http://192.168.0.191:8000/api/accounts/get-image-by-id?id=${id}`,
+                uri: `http://192.168.43.23:8000/api/accounts/get-image-by-id?id=${id}`,
             },
         });
     });
