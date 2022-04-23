@@ -12,7 +12,7 @@ import {
     SET_IS_LOGIN_LOADING,
     SET_REDIRECT_AFTER_CREATE,
     SET_TASK_INFO,
-    SET_USER_INFO,
+    SET_USER_INFO, FETCH_UPDATE_TASK, UPDATE_TASK_IMAGES, SET_TASK_LIST, SET_IS_TASKS_LOADING, IS_UPDATE_STATUS_LOADING,
 } from "./types";
 
 const INITIAL_STATE = {
@@ -28,10 +28,25 @@ const INITIAL_STATE = {
     imagesIds: null,
     isCreateTaskLoading: false,
     redirectAfterCreate: false,
+
+    tasks: null,
+    isUpdateStatusLoading: false,
 };
 
 export const reducer = (state = INITIAL_STATE, action) => {
     switch (action.type) {
+        case IS_UPDATE_STATUS_LOADING:
+            return {
+                ...state,
+                isUpdateStatusLoading: action.val
+            }
+        case UPDATE_TASK_IMAGES:
+            let newIds = state.taskInfo.images_ids.filter(id=>id!==action.remove_id)
+            return {
+                ...state,
+                taskInfo: {...state.taskInfo, images_ids: newIds}
+
+            }
         case SET_REDIRECT_AFTER_CREATE:
             return {
                 ...state,
@@ -62,10 +77,15 @@ export const reducer = (state = INITIAL_STATE, action) => {
                 ...state,
                 clientTasks: action.list,
             };
+        case SET_TASK_LIST:
+            return {
+                ...state,
+                tasks: action.tasks,
+            };
         case IS_TASKS_LOADING:
             return {
                 ...state,
-                isTasksLoading: action.value,
+                isTasksLoading: action.val,
             };
         case LOGOUT:
             return {

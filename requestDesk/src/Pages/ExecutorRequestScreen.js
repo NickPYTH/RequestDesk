@@ -39,13 +39,18 @@ const ExecutorRequestScreenLayout = ({
     navigation,
     fetchGetTaskInfo,
 }) => {
+    const { taskId, otherParam } = route.params;
     useEffect(() => {
-        const { taskId, otherParam } = route.params;
         fetchGetTaskInfo(info.userInfo.phone, info.userInfo.email, taskId);
     }, []);
     const [visible, setVisible] = useState(false);
     const warningToggleState = useToggleState();
-    navigation.setOptions({ title: `Заявка №${123}` }); //Объект кто-подал
+    navigation.setOptions({ title: `Заявка №${taskId}` });
+    useEffect(()=> {
+        if (info.taskInfo)
+            warningToggleState.onChange(info.taskInfo.status)
+    }, [info.taskInfo])
+    console.log(info.taskInfo)
     if (info.isTaskInfoLoading || info.taskInfo === null)
         return (
             <Layout
@@ -66,14 +71,14 @@ const ExecutorRequestScreenLayout = ({
                 <ScrollView showsVerticalScrollIndicator={false}>
                     <Modal visible={visible}>
                         <Card>
-                            <Text category="h6">Иванов Иван Иванович</Text>
+                            <Text category="h6">{info.taskInfo.client_name} {info.taskInfo.client_second_name} {info.taskInfo.client_surname}</Text>
                             <Text category="h6" style={{ marginBottom: 15 }}>
-                                89825054353
+                                {info.taskInfo.client_phone}
                             </Text>
                             <Button
                                 onPress={() => {
                                     setVisible(false);
-                                    Clipboard.setString("89825054353");
+                                    Clipboard.setString( info.taskInfo.client_phone);
                                 }}
                                 style={{ marginBottom: 15 }}
                             >
@@ -94,7 +99,7 @@ const ExecutorRequestScreenLayout = ({
                         {info.taskInfo.description}
                     </Text>
                     <Text style={styles.obj} category="h6">
-                        Объект: УСС "Факел"
+                        Объект: {info.taskInfo.object}
                     </Text>
                     <View
                         style={{
@@ -111,11 +116,11 @@ const ExecutorRequestScreenLayout = ({
                             styles={{ margin: 14 }}
                             onPress={() => setVisible(true)}
                         >
-                            Иванов И.И.
+                            {info.taskInfo.client_surname} {info.taskInfo.client_name[0]}. {info.taskInfo.client_second_name[0]}.
                         </Button>
                     </View>
                     <View style={styles.carouselWrapper}>
-                        <Carousel />
+                        <Carousel ids={info.taskInfo.images_ids} />
                     </View>
                     <Toggle
                         style={styles.toggle}

@@ -21,7 +21,7 @@ const fetchGetTasks = (phone, email) => {
     };
 
     return fetch(
-        "http://192.168.43.23:8000/api/accounts/get-client-task",
+        "http://192.168.1.112:8000/api/accounts/get-client-task",
         requestOptions
     );
 };

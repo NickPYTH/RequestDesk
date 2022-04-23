@@ -13,6 +13,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
+import {ExecutorRequestScreen} from "../Pages/ExecutorRequestScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -74,6 +75,20 @@ export const NavigatorLayout = ({ info }) => {
                 <Stack.Screen
                     name="Request"
                     component={ClientRequestScreen}
+                    options={{
+                        title: "Заявка",
+                        headerStyle: {
+                            backgroundColor: "#FFCD07",
+                        },
+                        headerTintColor: "#fff",
+                        headerTitleStyle: {
+                            fontWeight: "bold",
+                        },
+                    }}
+                />
+                <Stack.Screen
+                    name="ExecutorRequest"
+                    component={ExecutorRequestScreen}
                     options={{
                         title: "Заявка",
                         headerStyle: {

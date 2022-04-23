@@ -18,6 +18,12 @@ import {
     SET_REDIRECT_AFTER_CREATE,
     SET_TASK_INFO,
     SET_USER_INFO,
+    FETCH_UPDATE_TASK,
+    UPDATE_TASK_IMAGES,
+    SET_TASK_LIST,
+    SET_IS_TASKS_LOADING,
+    FETCH_GET_TASKS,
+    FETCH_UPDATE_STATUS, IS_UPDATE_STATUS_LOADING,
 } from "./types";
 
 export const setIsLoadingTaskInfo = (value) => ({
@@ -125,3 +131,33 @@ export const setRedirectAfterCreate = (value) => ({
     type: SET_REDIRECT_AFTER_CREATE,
     value,
 });
+
+export const updateTaskImages = (remove_id) => ({
+    type: UPDATE_TASK_IMAGES,
+    remove_id
+})
+
+export const fetchUpdateTask = (id, title, description, equipment, removed_photos_ids, images) => ({
+    type: FETCH_UPDATE_TASK,
+    id, title, description, equipment, removed_photos_ids, images
+})
+
+export const setTaskList = (tasks) => ({
+    type: SET_TASK_LIST,
+    tasks
+})
+
+export const fetchGetTasks = () => ({
+    type: FETCH_GET_TASKS
+})
+
+export const fetchUpdateStatus = (status, taskId) => ({
+    type: FETCH_UPDATE_STATUS,
+    status, taskId
+})
+
+export const isUpdateStatusLoading = (val) => ({
+    type: IS_UPDATE_STATUS_LOADING,
+    val
+})
+

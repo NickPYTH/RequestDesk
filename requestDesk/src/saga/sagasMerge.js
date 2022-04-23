@@ -4,6 +4,9 @@ import { getTasksWatcher } from "./getClientTasks";
 import { getTaskWatcher } from "./getTask";
 import { getImagesWatcher } from "./getImages";
 import { createTaskWatcher } from "./createTask";
+import {updateTaskWatcher} from "./updateTask";
+import {getExeTasksWatcher} from "./getTasks";
+import {updateTaskStatusWatcher} from "./updateTaskStatus";
 export function* rootWatcher() {
     yield all([
         authWatcher(),
@@ -11,5 +14,8 @@ export function* rootWatcher() {
         getTaskWatcher(),
         getImagesWatcher(),
         createTaskWatcher(),
+        updateTaskWatcher(),
+        getExeTasksWatcher(),
+        updateTaskStatusWatcher()
     ]);
 }

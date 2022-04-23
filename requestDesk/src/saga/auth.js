@@ -20,7 +20,7 @@ const fetchLogin = (phone, password) => {
     };
 
     return fetch(
-        "http://192.168.43.23:8000/api/accounts/login",
+        "http://192.168.1.112:8000/api/accounts/login",
         requestOptions
     );
 };

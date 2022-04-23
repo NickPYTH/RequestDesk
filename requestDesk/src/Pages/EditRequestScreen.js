@@ -13,7 +13,14 @@ import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import { AutocompleteDropdown } from "react-native-autocomplete-dropdown";
 import photo from "../../assets/photo.png";
 import { bindActionCreators } from "redux";
-import { fetchGetImage, fetchGetTaskInfo } from "../store/actions";
+import {
+    fetchGetClientTasks,
+    fetchGetImage,
+    fetchGetTaskInfo,
+    fetchUpdateTask,
+    setRedirectAfterCreate,
+    updateTaskImages
+} from "../store/actions";
 import { connect } from "react-redux";
 import * as React from "react";
 import Toast from "react-native-root-toast";
@@ -29,9 +36,13 @@ const EditRequestScreenLayout = ({
     navigation,
     fetchGetTaskInfo,
     fetchGetImage,
+                                     updateTaskImages,
+                                     fetchUpdateTask,
+                                     setRedirectAfterCreate,
+                                     fetchGetClientTasks
 }) => {
+    const { taskId, otherParam } = route.params;
     useEffect(() => {
-        const { taskId, otherParam } = route.params;
         fetchGetTaskInfo(info.userInfo.phone, info.userInfo.email, taskId);
     }, []);
     const [images, setImages] = useState([]);
@@ -41,18 +52,23 @@ const EditRequestScreenLayout = ({
     const [equipments, setEquipments] = useState([]);
     const titleState = useInputState(null);
     const descriptionState = useInputState(null);
+    const [removedPhotosIds, setRemovedPhotosIds] = useState([])
     const saveHandler = () => {
-        console.log(titleState.value, descriptionState.value, selectedItem.title)
-        if (titleState.value.trim() || titleState.value.trim() < 300)
-            Toast.show(
-                `Пустой заголовок заявки`,
-                {
-                    duration: Toast.durations.SHORT,
-                }
-            );
-
-        //navigation.goBack();
+        if (titleState.value.trim() && titleState.value.trim() && selectedItem)
+            fetchUpdateTask(taskId, titleState.value, descriptionState.value, selectedItem.title, removedPhotosIds, images)
+        else
+            Toast.show(`Заполните пустые поля`, {
+                duration: Toast.durations.LONG,
+            });
     };
+    if (info.redirectAfterCreate) {
+        navigation.goBack();
+        setRedirectAfterCreate(false);
+        Toast.show(`Заявка обновлена`, {
+            duration: Toast.durations.LONG,
+        });
+        fetchGetClientTasks(info.userInfo);
+    }
     if (info.taskInfo !== null && isFirst === false) {
         setIsFirst(true);
         info.userInfo.equipments.map((eq, id) => {
@@ -90,12 +106,18 @@ const EditRequestScreenLayout = ({
                         </Text>
                         <Button
                             onPress={() => {
-                                setImages((prev) =>
-                                    prev.filter(
-                                        (image, imageId) =>
-                                            imageId !== visible[1]
-                                    )
-                                );
+                                if (visible[2]) {
+                                    updateTaskImages(visible[1])
+                                    setRemovedPhotosIds(prev=>prev.concat(visible[1]))
+                                }
+                                else {
+                                    setImages((prev) =>
+                                        prev.filter(
+                                            (image, imageId) =>
+                                                imageId !== visible[1]
+                                        )
+                                    );
+                                }
                                 setVisible([false, null]);
                             }}
                             style={{ marginBottom: 15 }}
@@ -181,14 +203,14 @@ const EditRequestScreenLayout = ({
                                 <TouchableOpacity
                                     key={id}
                                     onLongPress={() => {
-                                        setVisible([true, id]);
+                                        setVisible([true, id, 'old']);
                                     }}
                                     activeOpacity={0.8}
                                 >
                                     <Image
                                         style={styles.tinyLogo}
                                         source={{
-                                            uri: `http://192.168.43.23:8000/api/accounts/get-image-by-id?id=${id}`,
+                                            uri: `http://192.168.1.112:8000/api/accounts/get-image-by-id?id=${id}`,
                                         }}
                                     />
                                 </TouchableOpacity>
@@ -234,18 +256,34 @@ const EditRequestScreenLayout = ({
                     </Button>
                 </View>
 
-                <Button
-                    style={{
-                        marginHorizontal: 15,
-                        marginBottom: 15,
-                        marginTop: 15,
-                    }}
-                    appearance="outline"
-                    status="warning"
-                    onPress={() => saveHandler()}
-                >
-                    Сохранить изменения
-                </Button>
+                {!info.isCreateTaskLoading ? (
+                    <Button
+                        style={{
+                            marginHorizontal: 15,
+                            marginBottom: 15,
+                            marginTop: 15,
+                        }}
+                        appearance="outline"
+                        status="warning"
+                        onPress={() => saveHandler()}
+                    >
+                        Сохранить изменения
+                    </Button>
+                ) : (
+                    <View
+                        style={{
+                            marginHorizontal: 15,
+                            marginBottom: 15,
+                            marginTop: 15,
+                            flex: 1,
+                            justifyContent: "flex-start",
+                            alignItems: "center",
+                        }}
+                    >
+                        <Spinner size="small" status="warning" />
+                    </View>
+                )}
+
             </View>
         );
     }
@@ -256,6 +294,10 @@ const mapDispatchToProps = (dispatch) =>
         {
             fetchGetTaskInfo,
             fetchGetImage,
+            updateTaskImages,
+            fetchUpdateTask,
+            setRedirectAfterCreate,
+            fetchGetClientTasks
         },
         dispatch
     );

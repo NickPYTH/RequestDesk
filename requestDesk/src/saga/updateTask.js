@@ -1,22 +1,15 @@
 import { call, put, takeEvery } from "redux-saga/effects";
-import { FETCH_CREATE_TASK } from "../store/types";
+import {FETCH_UPDATE_TASK} from "../store/types";
 import { setCreateTaskLoading, setRedirectAfterCreate } from "../store/actions";
 
-const fetchCreateTask = (
-    title,
-    description,
-    phone,
-    email,
-    object,
-    equipment,
-    images
+const request = (
+    id, title, description, equipment, removed_photos_ids, images
 ) => {
     let formData = new FormData();
-    formData.append("phone", phone);
-    formData.append("email", email);
+    formData.append("id", id);
     formData.append("title", title);
     formData.append("description", description);
-    formData.append("equipment_number", equipment.title.split(" ")[0]);
+    formData.append("equipment_number", equipment.split(" ")[0]);
     images.map((image, id) => {
         let name = `name${id + Math.random()}`;
         formData.append(name, {
@@ -25,33 +18,29 @@ const fetchCreateTask = (
             uri: image.uri,
         });
     });
+    formData.append("removed_photos_ids", removed_photos_ids.join(' '));
     let requestOptions = {
         method: "POST",
         body: formData,
         redirect: "follow",
     };
     return fetch(
-        "http://192.168.1.112:8000/api/accounts/create-task",
+        "http://192.168.1.112:8000/api/accounts/update-task",
         requestOptions
     );
 };
 
-function* createTaskWorker(info) {
+function* updateTaskWorker(info) {
     yield put(setCreateTaskLoading(true));
-    yield call(
-        fetchCreateTask,
-        info.title,
-        info.description,
-        info.phone,
-        info.email,
-        info.object,
-        info.equipment,
-        info.images
-    );
+    try{
+        yield call(request, info.id, info.title, info.description, info.equipment, info.removed_photos_ids, info.images);
+    }
+    catch (e){}
+
     yield put(setCreateTaskLoading(false));
     yield put(setRedirectAfterCreate(true));
 }
 
-export function* createTaskWatcher() {
-    yield takeEvery(FETCH_CREATE_TASK, createTaskWorker);
+export function* updateTaskWatcher() {
+    yield takeEvery(FETCH_UPDATE_TASK, updateTaskWorker);
 }
