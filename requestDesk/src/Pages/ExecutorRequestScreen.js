@@ -21,7 +21,9 @@ import * as Clipboard from "expo-clipboard";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import * as React from "react";
-import { fetchGetTaskInfo } from "../store/actions";
+import {fetchGetTaskInfo, fetchUpdateStatus} from "../store/actions";
+import {ExecutorRequestScreenNavigation} from "../Components/ExecutorRequestScreenNavigation";
+import {Message} from "../Components/Message";
 
 const useToggleState = (initialState = false) => {
     const [checked, setChecked] = useState(initialState);
@@ -38,6 +40,7 @@ const ExecutorRequestScreenLayout = ({
     route,
     navigation,
     fetchGetTaskInfo,
+                                         fetchUpdateStatus
 }) => {
     const { taskId, otherParam } = route.params;
     useEffect(() => {
@@ -45,12 +48,14 @@ const ExecutorRequestScreenLayout = ({
     }, []);
     const [visible, setVisible] = useState(false);
     const warningToggleState = useToggleState();
+    const [isUpdateStatusLoading, setIsUpdateStatusLoading] = useState(false)
+    const [activePage, setActivePage] = useState(0)
     navigation.setOptions({ title: `Заявка №${taskId}` });
     useEffect(()=> {
-        if (info.taskInfo)
+        if (info.taskInfo) {
             warningToggleState.onChange(info.taskInfo.status)
+        }
     }, [info.taskInfo])
-    console.log(info.taskInfo)
     if (info.isTaskInfoLoading || info.taskInfo === null)
         return (
             <Layout
@@ -68,68 +73,86 @@ const ExecutorRequestScreenLayout = ({
     else {
         return (
             <SafeAreaView style={styles.container}>
-                <ScrollView showsVerticalScrollIndicator={false}>
-                    <Modal visible={visible}>
-                        <Card>
-                            <Text category="h6">{info.taskInfo.client_name} {info.taskInfo.client_second_name} {info.taskInfo.client_surname}</Text>
-                            <Text category="h6" style={{ marginBottom: 15 }}>
-                                {info.taskInfo.client_phone}
+                {activePage === 0 ?
+                    <ScrollView showsVerticalScrollIndicator={false}>
+                        <Modal visible={visible}>
+                            <Card>
+                                <Text
+                                    category="h6">{info.taskInfo.client_name} {info.taskInfo.client_second_name} {info.taskInfo.client_surname}</Text>
+                                <Text category="h6" style={{marginBottom: 15}}>
+                                    {info.taskInfo.client_phone}
+                                </Text>
+                                <Button
+                                    onPress={() => {
+                                        setVisible(false);
+                                        Clipboard.setString(info.taskInfo.client_phone);
+                                    }}
+                                    style={{marginBottom: 15}}
+                                >
+                                    Скопировать номер
+                                </Button>
+                                <Button
+                                    status="danger"
+                                    onPress={() => setVisible(false)}
+                                >
+                                    Закрыть
+                                </Button>
+                            </Card>
+                        </Modal>
+                        <Text style={styles.title} category="h5">
+                            {info.taskInfo.info}
+                        </Text>
+                        <Text style={styles.description} category="h6">
+                            {info.taskInfo.description}
+                        </Text>
+                        <Text style={styles.obj} category="h6">
+                            Объект: {info.taskInfo.object}
+                        </Text>
+                        <View
+                            style={{
+                                display: "flex",
+                                flexDirection: "row",
+                                marginTop: 10,
+                            }}
+                        >
+                            <Text style={styles.obj} category="h6">
+                                Заказчик:{" "}
                             </Text>
                             <Button
-                                onPress={() => {
-                                    setVisible(false);
-                                    Clipboard.setString( info.taskInfo.client_phone);
-                                }}
-                                style={{ marginBottom: 15 }}
+                                size="tiny"
+                                styles={{margin: 14}}
+                                onPress={() => setVisible(true)}
                             >
-                                Скопировать номер
+                                {info.taskInfo.client_surname} {info.taskInfo.client_name[0]}. {info.taskInfo.client_second_name[0]}.
                             </Button>
-                            <Button
-                                status="danger"
-                                onPress={() => setVisible(false)}
-                            >
-                                Закрыть
-                            </Button>
-                        </Card>
-                    </Modal>
-                    <Text style={styles.title} category="h5">
-                        {info.taskInfo.info}
-                    </Text>
-                    <Text style={styles.description} category="h6">
-                        {info.taskInfo.description}
-                    </Text>
-                    <Text style={styles.obj} category="h6">
-                        Объект: {info.taskInfo.object}
-                    </Text>
-                    <View
-                        style={{
-                            display: "flex",
-                            flexDirection: "row",
-                            marginTop: 10,
-                        }}
-                    >
-                        <Text style={styles.obj} category="h6">
-                            Заказчик:{" "}
-                        </Text>
-                        <Button
-                            size="tiny"
-                            styles={{ margin: 14 }}
-                            onPress={() => setVisible(true)}
-                        >
-                            {info.taskInfo.client_surname} {info.taskInfo.client_name[0]}. {info.taskInfo.client_second_name[0]}.
-                        </Button>
-                    </View>
-                    <View style={styles.carouselWrapper}>
-                        <Carousel ids={info.taskInfo.images_ids} />
-                    </View>
-                    <Toggle
-                        style={styles.toggle}
-                        status="warning"
-                        {...warningToggleState}
-                    >
-                        Отметить как выполненое
-                    </Toggle>
-                </ScrollView>
+                        </View>
+                        <View style={styles.carouselWrapper}>
+                            <Carousel ids={info.taskInfo.images_ids}/>
+                        </View>
+                        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+                            {isUpdateStatusLoading ?
+                                <View style={{marginTop: 25}}><Spinner status="warning"/></View>
+
+                                :
+                                <Toggle
+                                    style={styles.toggle}
+                                    status="warning"
+                                    onChange={(val) => {
+                                        fetchUpdateStatus(val, taskId, setIsUpdateStatusLoading)
+                                        warningToggleState.onChange(val)
+                                    }}
+                                    checked={warningToggleState.checked}
+                                >
+                                    Отметить как выполненное
+                                </Toggle>}
+                        </View>
+                    </ScrollView>
+                    :
+                    <ScrollView showsVerticalScrollIndicator={false}>
+                        <Message />
+                    </ScrollView>
+                }
+                <ExecutorRequestScreenNavigation setActivePage={setActivePage}/>
             </SafeAreaView>
         );
     }
@@ -139,6 +162,7 @@ const mapDispatchToProps = (dispatch) =>
     bindActionCreators(
         {
             fetchGetTaskInfo,
+            fetchUpdateStatus
         },
         dispatch
     );

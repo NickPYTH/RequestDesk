@@ -1,8 +1,7 @@
 import {Button, Card, Layout, Spinner, Text, Toggle} from "@ui-kitten/components";
 import { StyleSheet, View } from "react-native";
 import * as React from "react";
-import {useState} from "react";
-import {fetchUpdateStatus} from "../store/actions";
+import {useEffect, useState} from "react";
 
 const useToggleState = (initialState = false) => {
     const [checked, setChecked] = useState(initialState);
@@ -14,8 +13,12 @@ const useToggleState = (initialState = false) => {
     return { checked, onChange: onCheckedChange };
 };
 
-export const ExecutorRequestCard = ({ navigation, title, object, taskId, setTaskInfo, status, isUpdateStatusLoading, fetchUpdateStatus }) => {
+export const ExecutorRequestCard = ({ navigation, title, object, taskId, setTaskInfo, status, fetchUpdateStatus }) => {
     const warningToggleState = useToggleState(status);
+    const [isUpdateStatusLoading, setIsUpdateStatusLoading] = useState(false)
+    useEffect(()=> {
+        warningToggleState.onChange(status)
+        }, [status])
     const Footer = () => {
         return (
             <View style={[styles.footerContainer]}>
@@ -38,7 +41,7 @@ export const ExecutorRequestCard = ({ navigation, title, object, taskId, setTask
                             style={styles.toggle}
                             status="warning"
                             onChange={(val)=> {
-                                fetchUpdateStatus(val, taskId)
+                                fetchUpdateStatus(val, taskId, setIsUpdateStatusLoading)
                                 warningToggleState.onChange(val)
                             }}
                             checked={warningToggleState.checked}
@@ -76,6 +79,7 @@ const styles = StyleSheet.create({
     card: {
         marginVertical: 10,
         marginHorizontal: 20,
+        width: 340
     },
     footerContainer: {
         flexDirection: "row",

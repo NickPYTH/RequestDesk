@@ -151,9 +151,9 @@ export const fetchGetTasks = () => ({
     type: FETCH_GET_TASKS
 })
 
-export const fetchUpdateStatus = (status, taskId) => ({
+export const fetchUpdateStatus = (status, taskId, setIsUpdateStatusLoading) => ({
     type: FETCH_UPDATE_STATUS,
-    status, taskId
+    status, taskId, setIsUpdateStatusLoading
 })
 
 export const isUpdateStatusLoading = (val) => ({

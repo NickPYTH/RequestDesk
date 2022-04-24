@@ -83,14 +83,6 @@ const ExecutorScreenLayout = ({
                 <Spinner status="warning" />
             ) : (
                 <ScrollView showsVerticalScrollIndicator={false}>
-                    <Button
-                        style={styles.button}
-                        appearance="outline"
-                        status="warning"
-                        onPress={() => navigation.push("CreateRequest")}
-                    >
-                        Создать заявку
-                    </Button>
                     {info.tasks &&
                     info.tasks.map((task) => {
                         return (
@@ -135,10 +127,6 @@ export const ExecutorScreen = connect(
 )(ExecutorScreenLayout);
 
 const styles = StyleSheet.create({
-    button: {
-        marginTop: 14,
-        marginHorizontal: "28%",
-    },
     container: {
         flex: 1,
         justifyContent: "center",

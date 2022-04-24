@@ -1,6 +1,6 @@
 import { call, put, takeEvery } from "redux-saga/effects";
 import {FETCH_UPDATE_STATUS} from "../store/types";
-import {isUpdateStatusLoading, setCreateTaskLoading} from "../store/actions";
+import {fetchGetTasks, isUpdateStatusLoading, setCreateTaskLoading} from "../store/actions";
 
 const request = (
     status, taskId
@@ -20,9 +20,10 @@ const request = (
 };
 
 function* updateTaskStatusWorker(info) {
-    yield put(isUpdateStatusLoading(true));
+    yield info.setIsUpdateStatusLoading(true);
     yield call(request, info.status, info.taskId);
-    yield put(isUpdateStatusLoading(false));
+    yield put(fetchGetTasks())
+    yield info.setIsUpdateStatusLoading(false);
 }
 
 export function* updateTaskStatusWatcher() {
