@@ -36,7 +36,7 @@ const ExecutorScreenLayout = ({
                     style={{
                         flex: 1,
                         flexDirection: "row",
-                        backgroundColor: "#FFCD07",
+                        backgroundColor: "#f2f5fe",
                     }}
                 >
                     <TouchableOpacity

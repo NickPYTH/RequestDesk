@@ -23,16 +23,6 @@ import { connect } from "react-redux";
 import * as React from "react";
 import { fetchGetImage, fetchGetTaskInfo } from "../store/actions";
 
-const useToggleState = (initialState = false) => {
-    const [checked, setChecked] = useState(initialState);
-
-    const onCheckedChange = (isChecked) => {
-        setChecked(isChecked);
-    };
-
-    return { checked, onChange: onCheckedChange };
-};
-
 const RequestScreenLayout = ({
     info,
     route,

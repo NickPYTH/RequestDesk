@@ -10,7 +10,7 @@ const fetchGetTasks = () => {
     };
 
     return fetch(
-        "http://192.168.1.112:8000/api/accounts/get-tasks",
+        "http://176.57.217.201:8888/api/accounts/get-tasks",
         requestOptions
     );
 };

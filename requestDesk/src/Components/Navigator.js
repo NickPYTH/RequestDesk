@@ -20,14 +20,14 @@ const Stack = createNativeStackNavigator();
 export const NavigatorLayout = ({ info }) => {
     return (
         <NavigationContainer>
-            <Stack.Navigator initialRouteName="Home">
+            <Stack.Navigator initialRouteName="Home" screenOptions={{headerShadowVisible: false}}>
                 <Stack.Screen
                     name="EditRequest"
                     component={EditRequestScreen}
                     options={{
                         title: "Редакция заявки",
                         headerStyle: {
-                            backgroundColor: "#FFCD07",
+                            backgroundColor: "#f2f5fe",
                         },
                         headerTintColor: "#fff",
                         headerTitleStyle: {
@@ -41,9 +41,9 @@ export const NavigatorLayout = ({ info }) => {
                     options={{
                         title: "Вход",
                         headerStyle: {
-                            backgroundColor: "#FFCD07",
+                            backgroundColor: "#f2f5fe",
                         },
-                        headerTintColor: "#fff",
+                        headerTintColor: "#242529",
                         headerTitleStyle: {
                             fontWeight: "bold",
                         },
@@ -55,7 +55,7 @@ export const NavigatorLayout = ({ info }) => {
                     options={{
                         title: "Заявки",
                         headerStyle: {
-                            backgroundColor: "#FFCD07",
+                            backgroundColor: "#f2f5fe",
                         },
                         headerTintColor: "#fff",
                         headerTitleStyle: {
@@ -78,9 +78,9 @@ export const NavigatorLayout = ({ info }) => {
                     options={{
                         title: "Заявка",
                         headerStyle: {
-                            backgroundColor: "#FFCD07",
+                            backgroundColor: "#f2f5fe",
                         },
-                        headerTintColor: "#fff",
+                        headerTintColor: "#242529",
                         headerTitleStyle: {
                             fontWeight: "bold",
                         },
@@ -92,7 +92,7 @@ export const NavigatorLayout = ({ info }) => {
                     options={{
                         title: "Заявка",
                         headerStyle: {
-                            backgroundColor: "#FFCD07",
+                            backgroundColor: "#f2f5fe",
                         },
                         headerTintColor: "#fff",
                         headerTitleStyle: {
@@ -106,11 +106,11 @@ export const NavigatorLayout = ({ info }) => {
                     options={{
                         title: "Отправленные заявки",
                         headerStyle: {
-                            backgroundColor: "#FFCD07",
+                            backgroundColor: "#f2f5fe",
                         },
-                        headerTintColor: "#fff",
+                        headerTintColor: "#242529",
                         headerTitleStyle: {
-                            fontWeight: "bold",
+                            fontWeight: '300'
                         },
                     }}
                 />
@@ -120,7 +120,7 @@ export const NavigatorLayout = ({ info }) => {
                     options={{
                         title: "Создание заявки",
                         headerStyle: {
-                            backgroundColor: "#FFCD07",
+                            backgroundColor: "#f2f5fe",
                         },
                         headerTintColor: "#fff",
                         headerTitleStyle: {
@@ -134,7 +134,7 @@ export const NavigatorLayout = ({ info }) => {
                     options={{
                         title: "Сделайте фото",
                         headerStyle: {
-                            backgroundColor: "#FFCD07",
+                            backgroundColor: "#f2f5fe",
                         },
                         headerTintColor: "#fff",
                         headerTitleStyle: {

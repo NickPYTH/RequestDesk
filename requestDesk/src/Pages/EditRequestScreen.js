@@ -210,7 +210,7 @@ const EditRequestScreenLayout = ({
                                     <Image
                                         style={styles.tinyLogo}
                                         source={{
-                                            uri: `http://192.168.1.112:8000/api/accounts/get-image-by-id?id=${id}`,
+                                            uri: `http://176.57.217.201:8888/api/accounts/get-image-by-id?id=${id}`,
                                         }}
                                     />
                                 </TouchableOpacity>

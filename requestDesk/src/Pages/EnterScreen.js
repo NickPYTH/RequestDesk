@@ -27,7 +27,7 @@ const useInputState = (initialValue = "") => {
 
 const EnterScreenLayout = ({ navigation, info, fetchLogin }) => {
     useEffect(() => {
-        fetchLogin("123456782", "1234");
+        //fetchLogin("123456782", "1234");
         AsyncStorage.getItem("password").then((password) => {
             AsyncStorage.getItem("phone").then((phone) => {
                 fetchLogin(phone, password);

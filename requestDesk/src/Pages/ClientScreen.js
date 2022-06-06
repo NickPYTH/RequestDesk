@@ -1,9 +1,18 @@
-import { Avatar, Button, Layout, Spinner } from "@ui-kitten/components";
+import {
+    Avatar,
+    Button,
+    Icon,
+    Layout,
+    MenuItem,
+    OverflowMenu,
+    Spinner,
+    TopNavigationAction
+} from "@ui-kitten/components";
 import {
     StyleSheet,
     TouchableOpacity,
     SafeAreaView,
-    ScrollView,
+    ScrollView, View, Text,
 } from "react-native";
 import { RequestCard } from "../Components/RequestCard";
 import logoutImg from "../../assets/logout.png";
@@ -16,27 +25,48 @@ import {
     setRedirectAfterCreate, setTaskInfo,
 } from "../store/actions";
 import { connect } from "react-redux";
-import { useEffect } from "react";
+import {useEffect, useState} from "react";
+import {BACKGROUND_COLOR, MAIN_COLOR} from "../themes";
+import {AddRequestButton} from "../Components/AddRequestButton";
 
 const ClientScreenLayout = ({
     info,
     navigation,
     logout,
     fetchGetClientTasks,
-                                setTaskInfo
+    setTaskInfo
 }) => {
+    const [menuVisible, setMenuVisible] = useState(false)
+    const RefreshIcon = (props) => (
+        <Icon {...props} name='refresh-outline'/>
+    );
+
+    const LogoutIcon = (props) => (
+        <Icon {...props} name='log-out'/>
+    );
+
+    const MenuIcon = (props) => (
+        <Icon {...props} name='more-vertical'/>
+    );
+
+    const toggleMenu = () => {
+        setMenuVisible(!menuVisible);
+    };
+    const renderMenuAction = () => (
+        <TopNavigationAction icon={MenuIcon} onPress={toggleMenu}/>
+    );
     useEffect(() => {
         fetchGetClientTasks(info.userInfo);
     }, []);
 
     navigation.setOptions({
-        headerRight: () => (
+        headerRight1: () => (
             <Layout>
                 <Layout
                     style={{
                         flex: 1,
                         flexDirection: "row",
-                        backgroundColor: "#FFCD07",
+                        backgroundColor: "#f2f5fe",
                     }}
                 >
                     <TouchableOpacity
@@ -76,21 +106,26 @@ const ClientScreenLayout = ({
                 </Layout>
             </Layout>
         ),
+        headerRight: ()=> (
+                    <View style={{marginTop: 7}}>
+                        <OverflowMenu
+                            anchor={renderMenuAction}
+                            visible={menuVisible}
+                            onBackdropPress={toggleMenu}>
+                            <MenuItem accessoryLeft={RefreshIcon} title='Обновить'/>
+                            <MenuItem accessoryLeft={LogoutIcon} title='Выйти'/>
+                        </OverflowMenu>
+                    </View>
+        )
     });
+    
     return (
         <SafeAreaView style={styles.container}>
+            <AddRequestButton fun={()=>navigation.push("CreateRequest")} />
             {info.isTasksLoading ? (
                 <Spinner status="warning" />
             ) : (
                 <ScrollView showsVerticalScrollIndicator={false}>
-                    <Button
-                        style={styles.button}
-                        appearance="outline"
-                        status="warning"
-                        onPress={() => navigation.push("CreateRequest")}
-                    >
-                        Создать заявку
-                    </Button>
                     {info.clientTasks &&
                         info.clientTasks.map((task) => {
                             return (
@@ -140,5 +175,6 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
-    },
+        backgroundColor: BACKGROUND_COLOR
+    }
 });
