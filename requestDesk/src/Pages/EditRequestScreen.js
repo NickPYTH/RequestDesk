@@ -24,6 +24,7 @@ import {
 import { connect } from "react-redux";
 import * as React from "react";
 import Toast from "react-native-root-toast";
+import {BACKGROUND_COLOR, MAIN_COLOR} from "../themes";
 
 const useInputState = (initialValue = "") => {
     const [value, setValue] = useState(initialValue);
@@ -93,7 +94,7 @@ const EditRequestScreenLayout = ({
                     alignItems: "center",
                 }}
             >
-                <Spinner status="warning" />
+                <Spinner status="primary" />
             </Layout>
         );
     } else {
@@ -152,7 +153,7 @@ const EditRequestScreenLayout = ({
                         autoCapitalize: "none",
                         style: {
                             borderRadius: 5,
-                            borderColor: "#ffaa00",
+                            borderColor: MAIN_COLOR,
                             borderWidth: 1,
                             backgroundColor: "#fff",
                             color: "black",
@@ -180,14 +181,14 @@ const EditRequestScreenLayout = ({
                 />
                 <Input
                     style={{ marginHorizontal: 15, marginVertical: 15 }}
-                    status="warning"
+                    status="primary"
                     placeholder={info.taskInfo && info.taskInfo.info}
                     {...titleState}
                 />
                 <Input
                     style={{ marginHorizontal: 15, marginBottom: 15 }}
                     multiline={true}
-                    status="warning"
+                    status="primary"
                     textStyle={{ minHeight: 64 }}
                     placeholder={info.taskInfo && info.taskInfo.description}
                     {...descriptionState}
@@ -195,7 +196,7 @@ const EditRequestScreenLayout = ({
                 <View
                     style={{
                         ...styles.gallery,
-                        height: images.length > 3 ? 200 : 100,
+                        height: info.taskInfo.images_ids.length+images.length > 3 ? 200 : 100,
                     }}
                 >
                     {info.taskInfo.images_ids.map((id) => {
@@ -243,7 +244,7 @@ const EditRequestScreenLayout = ({
                             borderRadius: 15,
                         }}
                         appearance="outline"
-                        status="warning"
+                        status="primary"
                         onPress={() =>
                             navigation.push("Camera", { images, setImages })
                         }
@@ -264,7 +265,7 @@ const EditRequestScreenLayout = ({
                             marginTop: 15,
                         }}
                         appearance="outline"
-                        status="warning"
+                        status="primary"
                         onPress={() => saveHandler()}
                     >
                         Сохранить изменения
@@ -280,7 +281,7 @@ const EditRequestScreenLayout = ({
                             alignItems: "center",
                         }}
                     >
-                        <Spinner size="small" status="warning" />
+                        <Spinner size="small" status="primary" />
                     </View>
                 )}
 
@@ -315,6 +316,7 @@ export const EditRequestScreen = connect(
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: BACKGROUND_COLOR
     },
     tinyLogo: {
         width: 80,
@@ -327,7 +329,7 @@ const styles = StyleSheet.create({
         display: "flex",
         flexDirection: "row",
         height: 100,
-        borderColor: "#ffaa00",
+        borderColor: MAIN_COLOR,
         borderWidth: 1,
         marginHorizontal: 15,
         borderRadius: 5,

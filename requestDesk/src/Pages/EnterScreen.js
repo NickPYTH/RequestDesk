@@ -13,10 +13,11 @@ import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { fetchLogin } from "../store/actions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {BACKGROUND_COLOR} from "../themes";
 
 const LoadingIndicator = (props) => (
     <View style={[props.style, styles.indicator]}>
-        <Spinner size="small" status="warning" />
+        <Spinner size="small" status="primary" />
     </View>
 );
 
@@ -27,7 +28,7 @@ const useInputState = (initialValue = "") => {
 
 const EnterScreenLayout = ({ navigation, info, fetchLogin }) => {
     useEffect(() => {
-        //fetchLogin("123456782", "1234");
+        //fetchLogin("123456782", "1");
         AsyncStorage.getItem("password").then((password) => {
             AsyncStorage.getItem("phone").then((phone) => {
                 fetchLogin(phone, password);
@@ -52,24 +53,24 @@ const EnterScreenLayout = ({ navigation, info, fetchLogin }) => {
         });
     return (
         <Layout
-            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+            style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: BACKGROUND_COLOR }}
         >
-            <Card style={{ width: "90%" }}>
+            <Card style={{ width: "90%", elevation: 5 }}>
                 <Input
                     style={{ marginBottom: 15, paddingTop: 10 }}
-                    status="warning"
+                    status="primary"
                     placeholder="Логин"
                     {...loginState}
                 />
                 <Input
                     style={{ marginBottom: 15 }}
-                    status="warning"
+                    status="primary"
                     placeholder="Пароль"
                     {...passwordState}
                 />
                 <Button
                     style={styles.button}
-                    status="warning"
+                    status="primary"
                     appearance="outline"
                     accessoryLeft={
                         info.isLoginLoading ? <LoadingIndicator /> : null

@@ -2,12 +2,17 @@ import {View, StyleSheet} from 'react-native'
 import {Text} from "@ui-kitten/components";
 
 
-export const Message = ({text}) => {
+export const Message = ({text, date, yours}) => {
     return (
         <View style={styles.wrapper}>
             <Text>
-                ddd
+                {text}
             </Text>
+            <View style={{marginTop: 10, flex: 1, alignItems: 'flex-end'}}>
+                <Text category='label'>
+                    Отправлено {!yours ? "вами" : "вам"} в {date}
+                </Text>
+            </View>
         </View>
     )
 }
@@ -15,7 +20,7 @@ export const Message = ({text}) => {
 const styles = StyleSheet.create({
     wrapper: {
         marginHorizontal: 20,
-        marginVertical: 20,
+        marginVertical: 10,
         padding: 15,
         borderRadius: 5,
         shadowColor: 'black',

@@ -29,7 +29,7 @@ export const NavigatorLayout = ({ info }) => {
                         headerStyle: {
                             backgroundColor: "#f2f5fe",
                         },
-                        headerTintColor: "#fff",
+                        headerTintColor: "#242529",
                         headerTitleStyle: {
                             fontWeight: "bold",
                         },
@@ -57,7 +57,7 @@ export const NavigatorLayout = ({ info }) => {
                         headerStyle: {
                             backgroundColor: "#f2f5fe",
                         },
-                        headerTintColor: "#fff",
+                        headerTintColor: "#242529",
                         headerTitleStyle: {
                             fontWeight: "bold",
                         },
@@ -94,7 +94,7 @@ export const NavigatorLayout = ({ info }) => {
                         headerStyle: {
                             backgroundColor: "#f2f5fe",
                         },
-                        headerTintColor: "#fff",
+                        headerTintColor: "#242529",
                         headerTitleStyle: {
                             fontWeight: "bold",
                         },
@@ -110,7 +110,7 @@ export const NavigatorLayout = ({ info }) => {
                         },
                         headerTintColor: "#242529",
                         headerTitleStyle: {
-                            fontWeight: '300'
+                            fontWeight: 'bold'
                         },
                     }}
                 />
@@ -122,7 +122,7 @@ export const NavigatorLayout = ({ info }) => {
                         headerStyle: {
                             backgroundColor: "#f2f5fe",
                         },
-                        headerTintColor: "#fff",
+                        headerTintColor: "#242529",
                         headerTitleStyle: {
                             fontWeight: "bold",
                         },
@@ -136,7 +136,7 @@ export const NavigatorLayout = ({ info }) => {
                         headerStyle: {
                             backgroundColor: "#f2f5fe",
                         },
-                        headerTintColor: "#fff",
+                        headerTintColor: "#242529",
                         headerTitleStyle: {
                             fontWeight: "bold",
                         },

@@ -21,7 +21,12 @@ import * as Clipboard from "expo-clipboard";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import * as React from "react";
-import { fetchGetImage, fetchGetTaskInfo } from "../store/actions";
+import {fetchGetImage, fetchGetTaskInfo, getComments, sendComment} from "../store/actions";
+import {BACKGROUND_COLOR} from "../themes";
+import {Message} from "../Components/Message";
+import {AddMessageButton} from "../Components/AddMessageButton";
+import {AddMessageModal} from "../Components/AddMessageModal";
+import {ExecutorRequestScreenNavigation} from "../Components/ExecutorRequestScreenNavigation";
 
 const RequestScreenLayout = ({
     info,
@@ -29,11 +34,21 @@ const RequestScreenLayout = ({
     navigation,
     fetchGetTaskInfo,
     fetchGetImage,
+                                 sendComment,
+                                 getComments
 }) => {
     const { taskId, otherParam } = route.params;
+    const [activePage, setActivePage] = useState(0)
+    const [visibleAddMessage, setVisibleAddMessage] = useState(false)
     useEffect(() => {
         fetchGetTaskInfo(info.userInfo.phone, info.userInfo.email, taskId);
+        getComments(taskId);
     }, []);
+    useEffect(()=>{
+        if (visibleAddMessage===false){
+            getComments(taskId);
+        }
+    }, [visibleAddMessage])
     navigation.setOptions({ title: `Заявка №${taskId}` }); //Объект кто-подал
     if (
         info.isTaskInfoLoading ||
@@ -56,6 +71,8 @@ const RequestScreenLayout = ({
     else {
         return (
             <SafeAreaView style={styles.container}>
+                {activePage === 0 ?
+            <ScrollView style={styles.container}>
                 <ScrollView showsVerticalScrollIndicator={false}>
                     <Text style={styles.title} category="h5">
                         {info.taskInfo.info}
@@ -67,6 +84,17 @@ const RequestScreenLayout = ({
                         <Carousel ids={info.taskInfo.images_ids} />
                     </View>
                 </ScrollView>
+            </ScrollView>
+                    :
+                    <>
+                        <ScrollView showsVerticalScrollIndicator={false}>
+                            {info.comments.comments?.map(comment=> <Message text={comment[0]} yours={!comment[1]} date={comment[2]}/>)}
+                        </ScrollView>
+                        <AddMessageButton fun={setVisibleAddMessage} />
+                        <AddMessageModal setVisible={setVisibleAddMessage} visible={visibleAddMessage} sendComment={sendComment} taskId={taskId} toExecutor={true}/>
+                    </>
+                }
+                <ExecutorRequestScreenNavigation setActivePage={setActivePage}/>
             </SafeAreaView>
         );
     }
@@ -77,6 +105,8 @@ const mapDispatchToProps = (dispatch) =>
         {
             fetchGetTaskInfo,
             fetchGetImage,
+            sendComment,
+            getComments
         },
         dispatch
     );
@@ -94,6 +124,7 @@ export const ClientRequestScreen = connect(
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: BACKGROUND_COLOR
     },
     title: {
         marginHorizontal: 15,

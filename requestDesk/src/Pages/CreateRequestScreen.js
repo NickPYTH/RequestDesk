@@ -19,6 +19,7 @@ import {
 } from "../store/actions";
 import { connect } from "react-redux";
 import Toast from "react-native-root-toast";
+import {MAIN_COLOR} from "../themes";
 
 const useInputState = (initialValue = "") => {
     const [value, setValue] = useState(initialValue);
@@ -103,7 +104,7 @@ const CreateRequestScreenLayout = ({
                     autoCapitalize: "none",
                     style: {
                         borderRadius: 5,
-                        borderColor: "#ffaa00",
+                        borderColor: MAIN_COLOR,
                         borderWidth: 1,
                         backgroundColor: "#fff",
                         color: "black",
@@ -131,14 +132,14 @@ const CreateRequestScreenLayout = ({
             />
             <Input
                 style={{ marginHorizontal: 15, marginVertical: 15 }}
-                status="warning"
+                status="primary"
                 placeholder="Тема заявки"
                 {...title}
             />
             <Input
                 style={{ marginHorizontal: 15, marginBottom: 15 }}
                 multiline={true}
-                status="warning"
+                status="primary"
                 textStyle={{ minHeight: 64 }}
                 placeholder="Описание заявки"
                 {...description}
@@ -176,7 +177,7 @@ const CreateRequestScreenLayout = ({
                         borderRadius: 15,
                     }}
                     appearance="outline"
-                    status="warning"
+                    status="primary"
                     onPress={() =>
                         navigation.push("Camera", { images, setImages })
                     }
@@ -196,7 +197,7 @@ const CreateRequestScreenLayout = ({
                         marginTop: 15,
                     }}
                     appearance="outline"
-                    status="warning"
+                    status="primary"
                     onPress={() => createHandler()}
                 >
                     Создать
@@ -212,7 +213,7 @@ const CreateRequestScreenLayout = ({
                         alignItems: "center",
                     }}
                 >
-                    <Spinner size="small" status="warning" />
+                    <Spinner size="small" status="primary" />
                 </View>
             )}
         </View>
@@ -254,7 +255,7 @@ const styles = StyleSheet.create({
         display: "flex",
         flexDirection: "row",
         height: 100,
-        borderColor: "#ffaa00",
+        borderColor: MAIN_COLOR,
         borderWidth: 1,
         marginHorizontal: 15,
         borderRadius: 5,

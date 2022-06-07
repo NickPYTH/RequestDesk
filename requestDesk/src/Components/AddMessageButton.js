@@ -3,10 +3,10 @@ import {MAIN_COLOR} from "../themes";
 import plus from "../../assets/plus.png";
 import {Avatar} from "@ui-kitten/components";
 
-export const AddRequestButton = ({fun}) => {
+export const AddMessageButton = ({fun}) => {
     return (
         <View style={styles.addButtonWrapper}>
-            <TouchableOpacity style={styles.addButton} onPress={()=>fun()}>
+            <TouchableOpacity style={styles.addButton} onPress={()=>fun(true)}>
                 <Avatar
                     style={{ margin: 8, width: 22, height: 22 }}
                     size="medium"
@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
         padding: 10,
         position: 'absolute',
         right: "8%",
-        bottom: "7%"
+        bottom: "11%"
     },
     addButton: {
         zIndex : 1,

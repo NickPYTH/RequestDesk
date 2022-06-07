@@ -21,9 +21,13 @@ import * as Clipboard from "expo-clipboard";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import * as React from "react";
-import {fetchGetTaskInfo, fetchUpdateStatus} from "../store/actions";
+import {fetchGetTaskInfo, fetchUpdateStatus, getComments, sendComment} from "../store/actions";
 import {ExecutorRequestScreenNavigation} from "../Components/ExecutorRequestScreenNavigation";
 import {Message} from "../Components/Message";
+import {BACKGROUND_COLOR} from "../themes";
+import {AddRequestButton} from "../Components/AddRequestButton";
+import {AddMessageButton} from "../Components/AddMessageButton";
+import {AddMessageModal} from "../Components/AddMessageModal";
 
 const useToggleState = (initialState = false) => {
     const [checked, setChecked] = useState(initialState);
@@ -40,17 +44,26 @@ const ExecutorRequestScreenLayout = ({
     route,
     navigation,
     fetchGetTaskInfo,
-                                         fetchUpdateStatus
+                                         fetchUpdateStatus,
+                                         sendComment,
+                                         getComments
 }) => {
     const { taskId, otherParam } = route.params;
     useEffect(() => {
         fetchGetTaskInfo(info.userInfo.phone, info.userInfo.email, taskId);
+        getComments(taskId);
     }, []);
     const [visible, setVisible] = useState(false);
     const warningToggleState = useToggleState();
     const [isUpdateStatusLoading, setIsUpdateStatusLoading] = useState(false)
     const [activePage, setActivePage] = useState(0)
+    const [visibleAddMessage, setVisibleAddMessage] = useState(false)
     navigation.setOptions({ title: `Заявка №${taskId}` });
+    useEffect(()=>{
+        if (visibleAddMessage===false){
+            getComments(taskId);
+        }
+    }, [visibleAddMessage])
     useEffect(()=> {
         if (info.taskInfo) {
             warningToggleState.onChange(info.taskInfo.status)
@@ -67,7 +80,7 @@ const ExecutorRequestScreenLayout = ({
                     alignItems: "center",
                 }}
             >
-                <Spinner status="warning" />
+                <Spinner status="primary" />
             </Layout>
         );
     else {
@@ -131,12 +144,12 @@ const ExecutorRequestScreenLayout = ({
                         </View>
                         <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
                             {isUpdateStatusLoading ?
-                                <View style={{marginTop: 25}}><Spinner status="warning"/></View>
+                                <View style={{marginTop: 25}}><Spinner status="primary"/></View>
 
                                 :
                                 <Toggle
                                     style={styles.toggle}
-                                    status="warning"
+                                    status="primary"
                                     onChange={(val) => {
                                         fetchUpdateStatus(val, taskId, setIsUpdateStatusLoading)
                                         warningToggleState.onChange(val)
@@ -148,9 +161,13 @@ const ExecutorRequestScreenLayout = ({
                         </View>
                     </ScrollView>
                     :
-                    <ScrollView showsVerticalScrollIndicator={false}>
-                        <Message />
-                    </ScrollView>
+                    <>
+                        <ScrollView showsVerticalScrollIndicator={false}>
+                            {info.comments.comments?.map(comment=> <Message text={comment[0]} yours={comment[1]} date={comment[2]}/>)}
+                        </ScrollView>
+                        <AddMessageButton fun={setVisibleAddMessage} />
+                        <AddMessageModal setVisible={setVisibleAddMessage} visible={visibleAddMessage} sendComment={sendComment} taskId={taskId} toExecutor={false}/>
+                    </>
                 }
                 <ExecutorRequestScreenNavigation setActivePage={setActivePage}/>
             </SafeAreaView>
@@ -162,7 +179,9 @@ const mapDispatchToProps = (dispatch) =>
     bindActionCreators(
         {
             fetchGetTaskInfo,
-            fetchUpdateStatus
+            fetchUpdateStatus,
+            sendComment,
+            getComments
         },
         dispatch
     );
@@ -180,6 +199,7 @@ export const ExecutorRequestScreen = connect(
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: BACKGROUND_COLOR
     },
     title: {
         marginHorizontal: 15,

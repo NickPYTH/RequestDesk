@@ -12,7 +12,13 @@ import {
     SET_IS_LOGIN_LOADING,
     SET_REDIRECT_AFTER_CREATE,
     SET_TASK_INFO,
-    SET_USER_INFO, FETCH_UPDATE_TASK, UPDATE_TASK_IMAGES, SET_TASK_LIST, SET_IS_TASKS_LOADING, IS_UPDATE_STATUS_LOADING,
+    SET_USER_INFO,
+    FETCH_UPDATE_TASK,
+    UPDATE_TASK_IMAGES,
+    SET_TASK_LIST,
+    SET_IS_TASKS_LOADING,
+    IS_UPDATE_STATUS_LOADING,
+    SEND_COMMENT, GET_COMMENTS, SET_COMMENTS,
 } from "./types";
 
 const INITIAL_STATE = {
@@ -31,10 +37,17 @@ const INITIAL_STATE = {
 
     tasks: null,
     isUpdateStatusLoading: false,
+
+    comments: []
 };
 
 export const reducer = (state = INITIAL_STATE, action) => {
     switch (action.type) {
+        case SET_COMMENTS:
+            return {
+                ...state,
+                comments: action.comments
+            }
         case IS_UPDATE_STATUS_LOADING:
             return {
                 ...state,

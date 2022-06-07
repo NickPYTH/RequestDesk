@@ -23,7 +23,7 @@ import {
     SET_TASK_LIST,
     SET_IS_TASKS_LOADING,
     FETCH_GET_TASKS,
-    FETCH_UPDATE_STATUS, IS_UPDATE_STATUS_LOADING,
+    FETCH_UPDATE_STATUS, IS_UPDATE_STATUS_LOADING, SEND_COMMENT, GET_COMMENTS, SET_COMMENTS,
 } from "./types";
 
 export const setIsLoadingTaskInfo = (value) => ({
@@ -161,3 +161,17 @@ export const isUpdateStatusLoading = (val) => ({
     val
 })
 
+export const sendComment = (taskId, message, toExecutor) => ({
+    type: SEND_COMMENT,
+    taskId, message, toExecutor
+})
+
+export const getComments = (taskId) => ({
+    type: GET_COMMENTS,
+    taskId
+})
+
+export const setComments = (comments) => ({
+    type: SET_COMMENTS,
+    comments
+})

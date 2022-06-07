@@ -7,6 +7,8 @@ import { createTaskWatcher } from "./createTask";
 import {updateTaskWatcher} from "./updateTask";
 import {getExeTasksWatcher} from "./getTasks";
 import {updateTaskStatusWatcher} from "./updateTaskStatus";
+import {sendMessageWatcher} from "./sendMessage";
+import {getMessagesWatcher} from "./getMessages";
 export function* rootWatcher() {
     yield all([
         authWatcher(),
@@ -16,6 +18,8 @@ export function* rootWatcher() {
         createTaskWatcher(),
         updateTaskWatcher(),
         getExeTasksWatcher(),
-        updateTaskStatusWatcher()
+        updateTaskStatusWatcher(),
+        sendMessageWatcher(),
+        getMessagesWatcher()
     ]);
 }

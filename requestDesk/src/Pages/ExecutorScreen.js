@@ -1,9 +1,18 @@
-import { Avatar, Button, Layout, Spinner } from "@ui-kitten/components";
+import {
+    Avatar,
+    Button,
+    Icon,
+    Layout,
+    MenuItem,
+    OverflowMenu,
+    Spinner,
+    TopNavigationAction
+} from "@ui-kitten/components";
 import {
     StyleSheet,
     TouchableOpacity,
     SafeAreaView,
-    ScrollView,
+    ScrollView, View,
 } from "react-native";
 import { RequestCard } from "../Components/RequestCard";
 import logoutImg from "../../assets/logout.png";
@@ -12,11 +21,12 @@ import * as React from "react";
 import { bindActionCreators } from "redux";
 import {
     fetchGetTasks, fetchUpdateStatus,
-    logout, setTaskInfo,
+    logout, setComments, setTaskInfo,
 } from "../store/actions";
 import { connect } from "react-redux";
-import { useEffect } from "react";
+import {useEffect, useState} from "react";
 import {ExecutorRequestCard} from "../Components/ExecutorRequestCard";
+import {BACKGROUND_COLOR} from "../themes";
 
 const ExecutorScreenLayout = ({
                                 info,
@@ -24,13 +34,34 @@ const ExecutorScreenLayout = ({
                                 logout,
                                   fetchGetTasks,
                                   setTaskInfo,
-                                  fetchUpdateStatus
+                                  fetchUpdateStatus,
+                                  setComments
                             }) => {
+    const [menuVisible, setMenuVisible] = useState(false)
+    const RefreshIcon = (props) => (
+        <Icon {...props} name='refresh-outline'/>
+    );
+
+    const LogoutIcon = (props) => (
+        <Icon {...props} name='log-out'/>
+    );
+
+    const MenuIcon = (props) => (
+        <Icon {...props} name='more-vertical'/>
+    );
+
+    const toggleMenu = () => {
+        setMenuVisible(!menuVisible);
+    };
+    const renderMenuAction = () => (
+        <TopNavigationAction icon={MenuIcon} onPress={toggleMenu}/>
+    );
     useEffect(() => {
         fetchGetTasks();
+        setComments([]);
     }, []);
     navigation.setOptions({
-        headerRight: () => (
+        headerRight1: () => (
             <Layout>
                 <Layout
                     style={{
@@ -76,11 +107,35 @@ const ExecutorScreenLayout = ({
                 </Layout>
             </Layout>
         ),
+        headerRight: ()=> (
+            <View style={{marginTop: 7}}>
+                <OverflowMenu
+                    anchor={renderMenuAction}
+                    visible={menuVisible}
+                    onBackdropPress={toggleMenu}
+                    onSelect={(e)=>{
+                        if (e.row===0){
+                            fetchGetTasks();
+                        }
+                        else{
+                            logout();
+                            navigation.reset({
+                                index: 0,
+                                routes: [{ name: "Home" }],
+                            });
+                        }
+                    }}
+                >
+                    <MenuItem accessoryLeft={RefreshIcon} title='Обновить'/>
+                    <MenuItem accessoryLeft={LogoutIcon} title='Выйти'/>
+                </OverflowMenu>
+            </View>
+        )
     });
     return (
         <SafeAreaView style={styles.container}>
             {info.isTasksLoading ? (
-                <Spinner status="warning" />
+                <Spinner status="primary" />
             ) : (
                 <ScrollView showsVerticalScrollIndicator={false}>
                     {info.tasks &&
@@ -111,7 +166,8 @@ const mapDispatchToProps = (dispatch) =>
             logout,
             fetchGetTasks,
             setTaskInfo,
-            fetchUpdateStatus
+            fetchUpdateStatus,
+            setComments
         },
         dispatch
     );
@@ -131,5 +187,6 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
+        backgroundColor: BACKGROUND_COLOR
     },
 });

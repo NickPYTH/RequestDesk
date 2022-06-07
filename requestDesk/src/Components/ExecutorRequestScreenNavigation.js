@@ -1,20 +1,21 @@
 import React, {useEffect, useState} from 'react';
 import {BottomNavigation, BottomNavigationTab, Icon, Text} from '@ui-kitten/components';
+import {BACKGROUND_COLOR, MAIN_COLOR} from "../themes";
 
 export const ExecutorRequestScreenNavigation = ({setActivePage}) => {
     const [taskClick, isTaskClick] = useState(false)
     const [CommentsClick, isCommentsClick] = useState(false)
     const PersonIcon = (props) => (
-        <Icon fill='#FFAA00' ref={taskIconRef} {...props} name='info-outline'/>
+        <Icon fill={MAIN_COLOR} ref={taskIconRef} {...props} name='info-outline'/>
     );
     const TaskText = () => {
-        return(<Text style={{color: '#FFAA00', fontSize: 12}}>Заявка</Text>)
+        return(<Text style={{color: MAIN_COLOR, fontSize: 12}}>Заявка</Text>)
     }
     const CommentIcon = (props) => (
-        <Icon fill='#FFAA00' ref={commentIconRef} {...props} name='message-square-outline'/>
+        <Icon fill={MAIN_COLOR} ref={commentIconRef} {...props} name='message-square-outline'/>
     );
     const CommentText = () => {
-        return(<Text style={{color: '#FFAA00', fontSize: 12}}>Комментарии</Text>)
+        return(<Text style={{color: MAIN_COLOR, fontSize: 12}}>Комментарии</Text>)
     }
     const taskIconRef = React.useRef();
     const commentIconRef = React.useRef();
@@ -25,7 +26,7 @@ export const ExecutorRequestScreenNavigation = ({setActivePage}) => {
 
     return (
         <BottomNavigation
-            indicatorStyle={{backgroundColor: '#FFAA00', height: 4}}
+            indicatorStyle={{backgroundColor: MAIN_COLOR, height: 4}}
             selectedIndex={selectedIndex}
             onSelect={index => {
                 setSelectedIndex(index)
@@ -35,7 +36,7 @@ export const ExecutorRequestScreenNavigation = ({setActivePage}) => {
                 if (index === 1)
                     isCommentsClick(prev=>!prev)
             }}
-            status='warning'
+            status='primary'
             >
             <BottomNavigationTab icon={PersonIcon} title={TaskText}/>
             <BottomNavigationTab icon={CommentIcon} title={CommentText}/>

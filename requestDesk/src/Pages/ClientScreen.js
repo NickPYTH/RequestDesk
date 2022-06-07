@@ -90,11 +90,7 @@ const ClientScreenLayout = ({
                     <TouchableOpacity
                         style={{ margin: 8, width: 30, height: 30 }}
                         onPress={() => {
-                            logout();
-                            navigation.reset({
-                                index: 0,
-                                routes: [{ name: "Home" }],
-                            });
+
                         }}
                     >
                         <Avatar
@@ -111,7 +107,20 @@ const ClientScreenLayout = ({
                         <OverflowMenu
                             anchor={renderMenuAction}
                             visible={menuVisible}
-                            onBackdropPress={toggleMenu}>
+                            onBackdropPress={toggleMenu}
+                            onSelect={(e)=>{
+                                if (e.row===0){
+                                    fetchGetClientTasks(info.userInfo);
+                                }
+                                else{
+                                    logout();
+                                    navigation.reset({
+                                        index: 0,
+                                        routes: [{ name: "Home" }],
+                                    });
+                                }
+                            }}
+                            >
                             <MenuItem accessoryLeft={RefreshIcon} title='Обновить'/>
                             <MenuItem accessoryLeft={LogoutIcon} title='Выйти'/>
                         </OverflowMenu>

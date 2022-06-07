@@ -8,7 +8,7 @@ export const RequestCard = ({ navigation, title, description, taskId, setTaskInf
                 <Button
                     style={styles.footerControl}
                     size="small"
-                    status="warning"
+                    status="primary"
                     onPress={() => {
                         setTaskInfo(null)
                         navigation.push("Request", {taskId})
@@ -19,7 +19,7 @@ export const RequestCard = ({ navigation, title, description, taskId, setTaskInf
                 <Button
                     style={styles.footerControl}
                     size="small"
-                    status="warning"
+                    status="primary"
                     onPress={() => {
                         setTaskInfo(null)
                         navigation.push("EditRequest", {taskId})
@@ -40,7 +40,7 @@ export const RequestCard = ({ navigation, title, description, taskId, setTaskInf
         <Card
             navigation={navigation}
             style={styles.card}
-            status="warning"
+            status="primary"
             footer={Footer}
             header={Header}
         >

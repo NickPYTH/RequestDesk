@@ -25,7 +25,7 @@ export const ExecutorRequestCard = ({ navigation, title, object, taskId, setTask
                 <Button
                     style={styles.footerControl}
                     size="small"
-                    status="warning"
+                    status="primary"
                     onPress={() => {
                         setTaskInfo(null)
                         navigation.push("ExecutorRequest", {taskId})
@@ -35,11 +35,11 @@ export const ExecutorRequestCard = ({ navigation, title, object, taskId, setTask
                 </Button>
                 <View style={{width: 15}}>
                     {isUpdateStatusLoading ?
-                        <Spinner status="warning" />
+                        <Spinner status="primary" />
                         :
                         <Toggle
                             style={styles.toggle}
-                            status="warning"
+                            status="primary"
                             onChange={(val)=> {
                                 fetchUpdateStatus(val, taskId, setIsUpdateStatusLoading)
                                 warningToggleState.onChange(val)
@@ -64,7 +64,7 @@ export const ExecutorRequestCard = ({ navigation, title, object, taskId, setTask
         <Card
             navigation={navigation}
             style={styles.card}
-            status="warning"
+            status="primary"
             footer={Footer}
             header={Header}
         >
