@@ -13,51 +13,16 @@ const useToggleState = (initialState = false) => {
     return { checked, onChange: onCheckedChange };
 };
 
-export const ExecutorRequestCard = ({ navigation, title, object, taskId, setTaskInfo, status, fetchUpdateStatus }) => {
+export const ExecutorRequestCard = ({ navigation, title, object, subObject, taskId, setTaskInfo, status, equipmentName, equipmentNumber, time, date }) => {
     const warningToggleState = useToggleState(status);
     const [isUpdateStatusLoading, setIsUpdateStatusLoading] = useState(false)
     useEffect(()=> {
         warningToggleState.onChange(status)
         }, [status])
-    const Footer = () => {
-        return (
-            <View style={[styles.footerContainer]}>
-                <Button
-                    style={styles.footerControl}
-                    size="small"
-                    status="primary"
-                    onPress={() => {
-                        setTaskInfo(null)
-                        navigation.push("ExecutorRequest", {taskId})
-                    }}
-                >
-                    Открыть
-                </Button>
-                <View style={{width: 15}}>
-                    {isUpdateStatusLoading ?
-                        <Spinner status="primary" />
-                        :
-                        <Toggle
-                            style={styles.toggle}
-                            status="primary"
-                            onChange={(val)=> {
-                                fetchUpdateStatus(val, taskId, setIsUpdateStatusLoading)
-                                warningToggleState.onChange(val)
-                            }}
-                            checked={warningToggleState.checked}
-                        >
-
-                        </Toggle>}
-                </View>
-
-
-            </View>
-        );
-    };
     const Header = (props) => (
-        <View {...props}>
-            <Text category="h6">{title}</Text>
-            <Text category="s1">От 01.03.2022</Text>
+        <View {...props} style={{display: 'flex', flexDirection: 'row', margin: 4, justifyContent: 'space-between'}}>
+            <Text category="s1" >От {time} {date}</Text>
+            <Text category="s1" style={{marginRight: 5}}>{status}</Text>
         </View>
     );
     return (
@@ -65,21 +30,26 @@ export const ExecutorRequestCard = ({ navigation, title, object, taskId, setTask
             navigation={navigation}
             style={styles.card}
             status="primary"
-            footer={Footer}
             header={Header}
+            onPress={() => {
+                setTaskInfo(null)
+                navigation.push("ExecutorRequest", {taskId})
+            }}
         >
-            <Layout>
-                <Text style={{ maxHeight: 50 }}>{object}</Text>
-            </Layout>
+            <View>
+                <Text style={{fontWeight: 'bold'}}>{equipmentNumber}</Text>
+                <Text>{equipmentName}</Text>
+                <Text>{object}</Text>
+                <Text>{subObject}</Text>
+            </View>
         </Card>
     );
 };
 
 const styles = StyleSheet.create({
     card: {
-        marginVertical: 10,
-        marginHorizontal: 20,
-        width: 340
+        marginVertical: 5,
+        width: "100%"
     },
     footerContainer: {
         flexDirection: "row",

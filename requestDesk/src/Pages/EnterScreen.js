@@ -28,18 +28,21 @@ const useInputState = (initialValue = "") => {
 
 const EnterScreenLayout = ({ navigation, info, fetchLogin }) => {
     useEffect(() => {
-        //fetchLogin("123456782", "1");
         AsyncStorage.getItem("password").then((password) => {
-            AsyncStorage.getItem("phone").then((phone) => {
-                fetchLogin(phone, password);
+            AsyncStorage.getItem("username").then((username) => {
+                if (username && password)
+                    fetchLogin(username, password)
+                else
+                    AsyncStorage.clear()
             });
         });
     }, []);
+
     const loginState = useInputState();
     const passwordState = useInputState();
     const loginHandler = () => {
-        fetchLogin(loginState.value, passwordState.value);
-        AsyncStorage.setItem(passwordState.value);
+        if (loginState.value.trim() && passwordState.value.trim())
+            fetchLogin(loginState.value.trim(), passwordState.value.trim())
     };
     if (info.isClient && info.userInfo)
         navigation.reset({
@@ -80,6 +83,7 @@ const EnterScreenLayout = ({ navigation, info, fetchLogin }) => {
                 >
                     Войти
                 </Button>
+                <Text style={{position: 'absolute', bottom: 0, right: 0, margin: 5, fontSize: 10, opacity: 0.5}}>v1.0.13</Text>
             </Card>
         </Layout>
     );

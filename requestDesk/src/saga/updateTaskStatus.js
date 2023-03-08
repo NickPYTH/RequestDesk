@@ -1,6 +1,7 @@
 import { call, put, takeEvery } from "redux-saga/effects";
 import {FETCH_UPDATE_STATUS} from "../store/types";
 import {fetchGetTasks, isUpdateStatusLoading, setCreateTaskLoading} from "../store/actions";
+import {host} from "../conf";
 
 const request = (
     status, taskId
@@ -14,7 +15,7 @@ const request = (
         body: formData,
     };
     return fetch(
-        "http://176.57.217.201:8888/api/accounts/update-task-status",
+        `http://${host}:8000/api/accounts/update-task-status`,
         requestOptions
     );
 };

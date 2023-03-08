@@ -1,6 +1,6 @@
 import {
     FETCH_GET_TASK_INFO,
-    IS_TASKS_LOADING,
+    SET_IS_TASKS_LOADING,
     LOGOUT,
     SET_CLIENT_TASK_LIST,
     SET_IMAGE_IDS,
@@ -13,12 +13,16 @@ import {
     SET_REDIRECT_AFTER_CREATE,
     SET_TASK_INFO,
     SET_USER_INFO,
-    FETCH_UPDATE_TASK,
     UPDATE_TASK_IMAGES,
     SET_TASK_LIST,
-    SET_IS_TASKS_LOADING,
     IS_UPDATE_STATUS_LOADING,
-    SEND_COMMENT, GET_COMMENTS, SET_COMMENTS,
+    SET_COMMENTS,
+    SET_IS_FILIALS_LOADING,
+    SET_IS_OBJECTS_LOADING,
+    SET_IS_EQUIPMENTS_LOADING,
+    SET_FILIALS,
+    SET_OBJECTS,
+    SET_EQUIPMENTS,
 } from "./types";
 
 const INITIAL_STATE = {
@@ -27,22 +31,57 @@ const INITIAL_STATE = {
     isClient: false,
     isExecutor: false,
     userInfo: null,
-    isTasksLoading: false,
+    isTasksLoading: true,
     clientTasks: null,
     isTaskInfoLoading: false,
     taskInfo: null,
     imagesIds: null,
     isCreateTaskLoading: false,
     redirectAfterCreate: false,
-
     tasks: null,
     isUpdateStatusLoading: false,
+    comments: [],
 
-    comments: []
+    isFilialsLoading: false,
+    filials: null,
+    isObjectsLoading: false,
+    objects: null,
+    isEquipmentsLoading: false,
+    equipments: null
 };
 
 export const reducer = (state = INITIAL_STATE, action) => {
     switch (action.type) {
+        case SET_IS_FILIALS_LOADING:
+            return {
+                ...state,
+                isFilialsLoading: action.val
+            }
+        case SET_IS_OBJECTS_LOADING:
+            return {
+                ...state,
+                isObjectsLoading: action.val
+            }
+        case SET_IS_EQUIPMENTS_LOADING:
+            return {
+                ...state,
+                isEquipmentsLoading: action.val
+            }
+        case SET_FILIALS:
+            return {
+                ...state,
+                filials: action.filials
+            }
+        case SET_OBJECTS:
+            return {
+                ...state,
+                objects: action.objects
+            }
+        case SET_EQUIPMENTS:
+            return {
+                ...state,
+                equipments: action.equipments
+            }
         case SET_COMMENTS:
             return {
                 ...state,
@@ -95,10 +134,10 @@ export const reducer = (state = INITIAL_STATE, action) => {
                 ...state,
                 tasks: action.tasks,
             };
-        case IS_TASKS_LOADING:
+        case SET_IS_TASKS_LOADING:
             return {
                 ...state,
-                isTasksLoading: action.val,
+                isTasksLoading: action.value,
             };
         case LOGOUT:
             return {

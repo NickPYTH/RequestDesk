@@ -1,7 +1,7 @@
 import { EditRequestScreen } from "../Pages/EditRequestScreen";
 import { EnterScreen } from "../Pages/EnterScreen";
 import { ExecutorScreen } from "../Pages/ExecutorScreen";
-import { TouchableOpacity } from "react-native";
+import {TouchableOpacity, View} from "react-native";
 import { Avatar } from "@ui-kitten/components";
 import refresh from "../../assets/refresh.png";
 import { ClientRequestScreen } from "../Pages/ClientRequestScreen";
@@ -61,15 +61,6 @@ export const NavigatorLayout = ({ info }) => {
                         headerTitleStyle: {
                             fontWeight: "bold",
                         },
-                        headerRight: () => (
-                            <TouchableOpacity>
-                                <Avatar
-                                    style={{ margin: 8 }}
-                                    size="medium"
-                                    source={refresh}
-                                />
-                            </TouchableOpacity>
-                        ),
                     }}
                 />
                 <Stack.Screen

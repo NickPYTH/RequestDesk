@@ -1,6 +1,7 @@
 import { call, put, takeEvery } from "redux-saga/effects";
 import { FETCH_GET_TASK_INFO } from "../store/types";
 import { setIsLoadingTaskInfo, setTaskInfo } from "../store/actions";
+import {host} from "../conf";
 
 const fetchGetTask = (phone, email, taskId) => {
     let formData = new FormData();
@@ -15,7 +16,7 @@ const fetchGetTask = (phone, email, taskId) => {
     };
 
     return fetch(
-        "http://176.57.217.201:8888/api/accounts/get-task",
+        `http://${host}:8000/api/accounts/get-task`,
         requestOptions
     );
 };

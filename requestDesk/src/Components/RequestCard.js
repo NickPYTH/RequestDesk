@@ -1,7 +1,10 @@
-import { Button, Card, Layout, Text } from "@ui-kitten/components";
-import { StyleSheet, View } from "react-native";
+import {Avatar, Button, Card, Icon, Layout, Text} from "@ui-kitten/components";
+import { StyleSheet, View, Image } from "react-native";
+import work from "../../assets/work.png"
+import * as React from "react";
+import {MAIN_COLOR} from "../themes";
 
-export const RequestCard = ({ navigation, title, description, taskId, setTaskInfo }) => {
+export const RequestCard = ({ navigation, object, subObject, time, date, taskId, setTaskInfo, status, equipmentName, equipmentNumber }) => {
     const Footer = () => {
         return (
             <View style={[styles.footerContainer]}>
@@ -31,9 +34,11 @@ export const RequestCard = ({ navigation, title, description, taskId, setTaskInf
         );
     };
     const Header = (props) => (
-        <View {...props}>
-            <Text category="h6">{title}</Text>
-            <Text category="s1">От 01.03.2022</Text>
+        <View {...props} style={{display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', margin: 5, marginLeft: 20}}>
+            <View style={{display: 'flex', flexDirection: 'row'}}>
+                <Text category="s1" style={{marginLeft: 10}}>{status}</Text>
+            </View>
+            <Text category="s1" style={{marginRight: 5}}>От {time} {date}</Text>
         </View>
     );
     return (
@@ -44,9 +49,10 @@ export const RequestCard = ({ navigation, title, description, taskId, setTaskInf
             footer={Footer}
             header={Header}
         >
-            <Layout>
-                <Text style={{ maxHeight: 50 }}>{description}</Text>
-            </Layout>
+            <Text style={{fontWeight: 'bold'}}>{equipmentNumber}</Text>
+            <Text>{equipmentName}</Text>
+            <Text>{object}</Text>
+            <Text>{subObject}</Text>
         </Card>
     );
 };

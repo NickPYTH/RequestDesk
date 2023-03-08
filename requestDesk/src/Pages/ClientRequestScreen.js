@@ -17,7 +17,6 @@ import {
 } from "@ui-kitten/components";
 import { Carousel } from "../Components/Carousel";
 import { useEffect, useState } from "react";
-import * as Clipboard from "expo-clipboard";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import * as React from "react";
@@ -33,7 +32,6 @@ const RequestScreenLayout = ({
     route,
     navigation,
     fetchGetTaskInfo,
-    fetchGetImage,
                                  sendComment,
                                  getComments
 }) => {
@@ -65,7 +63,7 @@ const RequestScreenLayout = ({
                     alignItems: "center",
                 }}
             >
-                <Spinner status="warning" />
+                <Spinner status="primary" />
             </Layout>
         );
     else {
@@ -75,11 +73,28 @@ const RequestScreenLayout = ({
             <ScrollView style={styles.container}>
                 <ScrollView showsVerticalScrollIndicator={false}>
                     <Text style={styles.title} category="h5">
-                        {info.taskInfo.info}
+                        {info.taskInfo.title}
                     </Text>
-                    <Text style={styles.description} category="h6">
+                    <Text style={styles.description}>
                         {info.taskInfo.description}
                     </Text>
+                    <View style={{backgroundColor: 'white', margin: 10, borderRadius: 7, elevation: 5, padding: 5}}>
+                        <Text style={{marginLeft: 15}}>
+                            Филиал: {info.taskInfo.filial}
+                        </Text>
+                        <Text style={{marginLeft: 15}}>
+                            Объект: {info.taskInfo.object}
+                        </Text>
+                        <Text style={{marginLeft: 15}}>
+                            Оборудование: {info.taskInfo.equipmentName}
+                        </Text>
+                        <Text style={{marginLeft: 15}}>
+                            Номер: {info.taskInfo.equipmentInventoryNumber}
+                        </Text>
+                        <Text style={{marginLeft: 15}}>
+                            Статус: {info.taskInfo.status}
+                        </Text>
+                    </View>
                     <View style={styles.carouselWrapper}>
                         <Carousel ids={info.taskInfo.images_ids} />
                     </View>
@@ -129,6 +144,7 @@ const styles = StyleSheet.create({
     title: {
         marginHorizontal: 15,
         marginVertical: 15,
+        fontWeight: 'bold'
     },
     description: {
         marginHorizontal: 15,

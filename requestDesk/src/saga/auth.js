@@ -1,16 +1,15 @@
 import { call, put, takeEvery } from "redux-saga/effects";
 import { FETCH_LOGIN } from "../store/types";
-import {
-    setIsClient,
-    setIsExecutor,
-    setIsLoginLoading,
-    setUserInfo,
-} from "../store/actions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+    setIsClient, setIsExecutor,
+    setIsLoginLoading, setUserInfo,
+} from "../store/actions";
+import {host} from "../conf";
 
 const fetchLogin = (phone, password) => {
     let formData = new FormData();
-    formData.append("phone", phone);
+    formData.append("username", phone);
     formData.append("password", password);
 
     let requestOptions = {
@@ -20,7 +19,7 @@ const fetchLogin = (phone, password) => {
     };
 
     return fetch(
-        "http://176.57.217.201:8888/api/accounts/login",
+        `http://${host}:8000/api/accounts/login`,
         requestOptions
     );
 };
@@ -28,32 +27,44 @@ const fetchLogin = (phone, password) => {
 function* loginWorker(info) {
     yield put(setIsLoginLoading(true));
     const data = yield call(fetchLogin, info.phone, info.password);
+    console.log(data)
     if (data.status === 200) {
+        console.log('here')
         const json = yield call(() => new Promise((res) => res(data.json())));
         if (json.user === "client") yield put(setIsClient(true));
         else if (json.user === "executor") yield put(setIsExecutor(true));
         yield put(
             setUserInfo({
+                username: info.phone,
+                password: info.password,
                 email: json.email,
                 phone: json.phone,
                 name: json.name,
                 surname: json.surname,
                 secondName: json.secondName,
                 equipments: json.equipments,
+                objects: json.objects
             })
         );
         const storeData = async (value) => {
             try {
+                await AsyncStorage.setItem("username", info.phone);
+                await AsyncStorage.setItem("password", info.password);
+
                 await AsyncStorage.setItem("name", json.name);
                 await AsyncStorage.setItem("surname", json.surname);
                 await AsyncStorage.setItem("secondName", json.secondName);
                 await AsyncStorage.setItem("email", json.email);
-                await AsyncStorage.setItem("phone", json.phone);
             } catch (e) {
                 // saving error
             }
         };
         storeData();
+    }
+    else{
+        console.log('here')
+        yield put(setIsLoginLoading(false));
+        AsyncStorage.clear()
     }
     yield put(setIsLoginLoading(false));
 }

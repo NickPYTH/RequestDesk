@@ -1,5 +1,6 @@
 import { call, put, takeEvery } from "redux-saga/effects";
 import { FETCH_GET_IMAGE } from "../store/types";
+import {host} from "../conf";
 
 const fetchGetImage = (id) => {
     let requestOptions = {
@@ -7,7 +8,7 @@ const fetchGetImage = (id) => {
         redirect: "follow",
     };
     return fetch(
-        `http://176.57.217.201:8888/api/accounts/get-image-by-id?id=${id}`,
+        `http://${host}:8000/api/accounts/get-image-by-id?id=${id}`,
         requestOptions
     );
 };

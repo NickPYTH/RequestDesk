@@ -7,60 +7,80 @@ import {
     Spinner,
     Text,
 } from "@ui-kitten/components";
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import { AutocompleteDropdown } from "react-native-autocomplete-dropdown";
 import photo from "../../assets/photo.png";
-import { bindActionCreators } from "redux";
+import folders from "../../assets/folders.png";
 import {
     fetchCreateTask,
-    fetchGetClientTasks,
+    fetchGetClientTasks, fetchGetEquipments, fetchGetFilials, fetchGetObjects, setFilials,
     setRedirectAfterCreate,
 } from "../store/actions";
-import { connect } from "react-redux";
+import {connect, useDispatch, useSelector} from "react-redux";
 import Toast from "react-native-root-toast";
 import {MAIN_COLOR} from "../themes";
+import * as ImagePicker from "expo-image-picker";
 
 const useInputState = (initialValue = "") => {
     const [value, setValue] = useState(initialValue);
     return { value, onChangeText: setValue };
 };
 
-const CreateRequestScreenLayout = ({
-    info,
-    navigation,
-    fetchCreateTask,
-    setRedirectAfterCreate,
-    fetchGetClientTasks,
-}) => {
-    const [images, setImages] = useState([]);
-    const [visible, setVisible] = useState([false, null]);
+export const CreateRequestScreen = ({navigation}) => {
+    const dispatch = useDispatch();
+    const store = useSelector(store => store.reducer);
     const title = useInputState();
     const description = useInputState();
-    const [selectedItem, setSelectedItem] = useState(null);
-    let equipments = [];
-    if (info.userInfo)
-        info.userInfo.equipments.map((eq, id) => {
-            equipments.push({ id, title: eq.name + " " + eq.description });
-        });
+    const [images, setImages] = useState([]);
+    const [visible, setVisible] = useState([false, null]);
+    const [selectedFilial, setSelectedFilial] = useState(null);
+    const [selectedObject, setSelectedObject] = useState(null);
+    const [selectedEquipment, setSelectedEquipment] = useState(null);
+    useEffect(()=>dispatch(fetchGetFilials(store.userInfo.username, store.userInfo.password)), [])
+    useEffect(()=>{
+        if (selectedFilial)
+            dispatch(fetchGetObjects(store.userInfo.username, selectedFilial.title))
+    }, [selectedFilial])
+    useEffect(()=>{
+        if (selectedObject)
+            dispatch(fetchGetEquipments(store.userInfo.username, selectedFilial.title, selectedObject.title))
+    }, [selectedObject])
     const createHandler = () => {
-        fetchCreateTask(
-            title.value,
-            description.value,
-            info.userInfo.phone,
-            info.userInfo.email,
-            info.userInfo.object,
-            selectedItem,
-            images
-        );
+        if (selectedFilial && selectedObject && selectedEquipment)
+            dispatch(fetchCreateTask(
+                {
+                    title: title.value,
+                    description: description.value,
+                    username: store.userInfo.username,
+                    password: store.userInfo.password,
+                    email: store.userInfo.email,
+                    filial: selectedFilial.title,
+                    obj: selectedObject.title,
+                    equipment: selectedEquipment.title.split('|')[0],
+                    images
+                }
+            ));
     };
-    if (info.redirectAfterCreate) {
+    const pickImageHandler = async () => {
+        // No permissions request is necessary for launching the image library
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [16, 9],
+            quality: 0.7,
+        });
+        if (!result.cancelled) {
+            setImages(prev=>prev.concat(result))
+        }
+    };
+    if (store.redirectAfterCreate) {
         navigation.goBack();
-        setRedirectAfterCreate(false);
+        dispatch(setRedirectAfterCreate(false));
         Toast.show(`Заявка создана`, {
             duration: Toast.durations.LONG,
         });
-        fetchGetClientTasks(info.userInfo);
+        dispatch(fetchGetClientTasks(store.userInfo));
     }
     return (
         <View style={styles.container}>
@@ -91,15 +111,16 @@ const CreateRequestScreenLayout = ({
                 </Card>
             </Modal>
             <AutocompleteDropdown
+                loading={store.isFilialsLoading}
                 emptyResultText={"Ничего не найдено"}
                 clearOnFocus={false}
                 closeOnBlur={true}
                 closeOnSubmit={false}
                 initialValue={{ id: "2" }} // or just '2'
-                onSelectItem={setSelectedItem}
-                dataSet={equipments}
+                onSelectItem={setSelectedFilial}
+                dataSet={store?.filials?.map((filial, id)=>({id, title: filial}))}
                 textInputProps={{
-                    placeholder: "Начните вводить название объекта",
+                    placeholder: "Филиал",
                     autoCorrect: false,
                     autoCapitalize: "none",
                     style: {
@@ -130,10 +151,96 @@ const CreateRequestScreenLayout = ({
                     marginTop: 15,
                 }}
             />
+            {selectedFilial !== null &&
+                <AutocompleteDropdown
+                    loading={store.isObjectsLoading}
+                    emptyResultText={"Ничего не найдено"}
+                    clearOnFocus={false}
+                    closeOnBlur={true}
+                    closeOnSubmit={false}
+                    initialValue={{id: "2"}} // or just '2'
+                    onSelectItem={setSelectedObject}
+                    dataSet={store?.objects?.map((obj, id)=>({id, title: obj}))}
+                    textInputProps={{
+                        placeholder: "Объект",
+                        autoCorrect: false,
+                        autoCapitalize: "none",
+                        style: {
+                            borderRadius: 5,
+                            borderColor: MAIN_COLOR,
+                            borderWidth: 1,
+                            backgroundColor: "#fff",
+                            color: "black",
+                            paddingLeft: 18,
+                            height: 42,
+                        },
+                    }}
+                    rightButtonsContainerStyle={{
+                        backgroundColor: "#fff",
+                        top: 1,
+                        height: 39,
+                        right: 5,
+                    }}
+                    inputContainerStyle={{
+                        height: 42,
+                        backgroundColor: "#fff",
+                        marginHorizontal: 15,
+                        marginTop: 15,
+                        borderRadius: 5,
+                    }}
+                    suggestionsListContainerStyle={{
+                        backgroundColor: "#fff",
+                        marginTop: 15,
+                    }}
+                />
+            }
+            {(selectedFilial !== null && selectedObject !== null) &&
+                <AutocompleteDropdown
+                    loading={store.isEquipmentsLoading}
+                    emptyResultText={"Ничего не найдено"}
+                    clearOnFocus={false}
+                    closeOnBlur={true}
+                    closeOnSubmit={false}
+                    initialValue={{id: "2"}} // or just '2'
+                    onSelectItem={setSelectedEquipment}
+                    dataSet={store?.equipments?.map((eq, id) => ({id, title: eq}))}
+                    textInputProps={{
+                        placeholder: "Наименование техники/инвентарник",
+                        autoCorrect: false,
+                        autoCapitalize: "none",
+                        style: {
+                            borderRadius: 5,
+                            borderColor: MAIN_COLOR,
+                            borderWidth: 1,
+                            backgroundColor: "#fff",
+                            color: "black",
+                            paddingLeft: 18,
+                            height: 42,
+                        },
+                    }}
+                    rightButtonsContainerStyle={{
+                        backgroundColor: "#fff",
+                        top: 1,
+                        height: 39,
+                        right: 5,
+                    }}
+                    inputContainerStyle={{
+                        height: 42,
+                        backgroundColor: "#fff",
+                        marginHorizontal: 15,
+                        marginTop: 15,
+                        borderRadius: 5,
+                    }}
+                    suggestionsListContainerStyle={{
+                        backgroundColor: "#fff",
+                        marginTop: 15,
+                    }}
+                />
+            }
             <Input
                 style={{ marginHorizontal: 15, marginVertical: 15 }}
                 status="primary"
-                placeholder="Тема заявки"
+                placeholder="Заявленная неисправность"
                 {...title}
             />
             <Input
@@ -141,13 +248,13 @@ const CreateRequestScreenLayout = ({
                 multiline={true}
                 status="primary"
                 textStyle={{ minHeight: 64 }}
-                placeholder="Описание заявки"
+                placeholder="Описание неисправности"
                 {...description}
             />
             <View
                 style={{
                     ...styles.gallery,
-                    height: images.length > 3 ? 200 : 100,
+                    height: images.length > 2 ? 200 : 100,
                 }}
             >
                 {images.map((image, id) => {
@@ -188,8 +295,25 @@ const CreateRequestScreenLayout = ({
                         source={photo}
                     />
                 </Button>
+                <Button
+                    style={{
+                        height: 80,
+                        width: 80,
+                        marginLeft: 5,
+                        borderRadius: 15,
+                    }}
+                    appearance="outline"
+                    status="primary"
+                    onPress={pickImageHandler}
+                >
+                    <Avatar
+                        style={{ margin: 8 }}
+                        size="medium"
+                        source={folders}
+                    />
+                </Button>
             </View>
-            {!info.isCreateTaskLoading ? (
+            {!store.isCreateTaskLoading ? (
                 <Button
                     style={{
                         marginHorizontal: 15,
@@ -219,26 +343,6 @@ const CreateRequestScreenLayout = ({
         </View>
     );
 };
-
-const mapDispatchToProps = (dispatch) =>
-    bindActionCreators(
-        {
-            fetchCreateTask,
-            setRedirectAfterCreate,
-            fetchGetClientTasks,
-        },
-        dispatch
-    );
-
-const mapStateToProps = (state) => {
-    const info = state.reducer;
-    return { info };
-};
-
-export const CreateRequestScreen = connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(CreateRequestScreenLayout);
 
 const styles = StyleSheet.create({
     container: {

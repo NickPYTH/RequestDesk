@@ -3,101 +3,111 @@ import {
     Button,
     Card,
     Input,
-    Layout,
     Modal,
     Spinner,
     Text,
 } from "@ui-kitten/components";
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import { AutocompleteDropdown } from "react-native-autocomplete-dropdown";
 import photo from "../../assets/photo.png";
-import { bindActionCreators } from "redux";
+
 import {
     fetchGetClientTasks,
-    fetchGetImage,
-    fetchGetTaskInfo,
-    fetchUpdateTask,
+    fetchGetEquipments,
+    fetchGetFilials,
+    fetchGetObjects,
+    fetchGetTaskInfo, fetchUpdateTask,
+    setEquipments,
+    setObjects,
     setRedirectAfterCreate,
-    updateTaskImages
 } from "../store/actions";
-import { connect } from "react-redux";
-import * as React from "react";
+import {connect, useDispatch, useSelector} from "react-redux";
 import Toast from "react-native-root-toast";
-import {BACKGROUND_COLOR, MAIN_COLOR} from "../themes";
+import {MAIN_COLOR} from "../themes";
+import * as React from "react";
+import {host} from "../conf";
+import folders from "../../assets/folders.png";
+import * as ImagePicker from "expo-image-picker";
 
 const useInputState = (initialValue = "") => {
     const [value, setValue] = useState(initialValue);
     return { value, onChangeText: setValue };
 };
 
-const EditRequestScreenLayout = ({
-    info,
-    route,
-    navigation,
-    fetchGetTaskInfo,
-    fetchGetImage,
-                                     updateTaskImages,
-                                     fetchUpdateTask,
-                                     setRedirectAfterCreate,
-                                     fetchGetClientTasks
-}) => {
-    const { taskId, otherParam } = route.params;
-    useEffect(() => {
-        fetchGetTaskInfo(info.userInfo.phone, info.userInfo.email, taskId);
-    }, []);
+export const EditRequestScreen = ({route, navigation}) => {
+    const { taskId } = route.params;
+    const dispatch = useDispatch();
+    const store = useSelector(store => store.reducer);
+    const title = useInputState();
+    const description = useInputState();
     const [images, setImages] = useState([]);
-    const [isFirst, setIsFirst] = useState(false);
     const [visible, setVisible] = useState([false, null]);
-    const [selectedItem, setSelectedItem] = useState(null);
-    const [equipments, setEquipments] = useState([]);
-    const titleState = useInputState(null);
-    const descriptionState = useInputState(null);
-    const [removedPhotosIds, setRemovedPhotosIds] = useState([])
-    const saveHandler = () => {
-        if (titleState.value.trim() && titleState.value.trim() && selectedItem)
-            fetchUpdateTask(taskId, titleState.value, descriptionState.value, selectedItem.title, removedPhotosIds, images)
-        else
-            Toast.show(`Заполните пустые поля`, {
-                duration: Toast.durations.LONG,
-            });
+    const [selectedFilial, setSelectedFilial] = useState(null);
+    const [selectedObject, setSelectedObject] = useState(null);
+    const [selectedEquipment, setSelectedEquipment] = useState(null);
+    useEffect(()=>dispatch(fetchGetTaskInfo(store.userInfo.phone, store.userInfo.email, taskId)), [])
+    useEffect(()=>{
+        if (store.taskInfo){
+            title.onChangeText(store.taskInfo.title)
+            description.onChangeText(store.taskInfo.description)
+            setImages(store?.taskInfo?.images_ids?.map(id=>({
+                deleted: false,
+                imageId: id,
+                oldPhoto: true
+            })))
+        }
+    }, [store.taskInfo])
+    useEffect(()=>dispatch(fetchGetFilials(store.userInfo.username, store.userInfo.password)), [])
+    useEffect(()=>{
+        if (selectedFilial)
+            dispatch(fetchGetObjects(store.userInfo.username, selectedFilial.title))
+    }, [selectedFilial])
+    useEffect(()=>{
+        if (selectedObject && selectedFilial)
+            dispatch(fetchGetEquipments(store.userInfo.username, selectedFilial.title, selectedObject.title))
+    }, [selectedObject])
+    const updateHandler = () => {
+        if (selectedFilial && selectedObject && selectedEquipment)
+            dispatch(fetchUpdateTask(
+                {
+                    taskId: taskId,
+                    title: title.value,
+                    description: description.value,
+                    username: store.userInfo.username,
+                    password: store.userInfo.password,
+                    email: store.userInfo.email,
+                    filial: selectedFilial.title,
+                    obj: selectedObject.title,
+                    equipment: selectedEquipment.title,
+                    images
+                }
+            ));
     };
-    if (info.redirectAfterCreate) {
+    const pickImageHandler = async () => {
+        // No permissions request is necessary for launching the image library
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [16, 9],
+            quality: 0.7,
+        });
+        if (!result.cancelled) {
+            setImages(prev=>prev.concat({...result, oldPhoto: false}))
+        }
+    };
+    if (store.redirectAfterCreate) {
         navigation.goBack();
-        setRedirectAfterCreate(false);
-        Toast.show(`Заявка обновлена`, {
+        dispatch(setRedirectAfterCreate(false));
+        Toast.show(`Заявка создана`, {
             duration: Toast.durations.LONG,
         });
-        fetchGetClientTasks(info.userInfo);
+        dispatch(fetchGetClientTasks(store.userInfo));
     }
-    if (info.taskInfo !== null && isFirst === false) {
-        setIsFirst(true);
-        info.userInfo.equipments.map((eq, id) => {
-            setEquipments((prev) =>
-                prev.concat({
-                    id: String(id),
-                    title: eq.name + " " + eq.description,
-                })
-            );
-        });
-        titleState.onChangeText(info.taskInfo.info);
-        descriptionState.onChangeText(info.taskInfo.description);
+    if (store.taskInfo === null){
+        return(<View style={{display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 150}}><Spinner status="primary"/></View>)
     }
-    if (info.isTaskInfoLoading || info.taskInfo === null) {
-        return (
-            <Layout
-                style={{
-                    flex: 1,
-                    marginVertical: 50,
-                    backgroundColor: "#f1f1f1",
-                    justifyContent: "center",
-                    alignItems: "center",
-                }}
-            >
-                <Spinner status="primary" />
-            </Layout>
-        );
-    } else {
+    else
         return (
             <View style={styles.container}>
                 <Modal visible={visible[0]}>
@@ -107,18 +117,11 @@ const EditRequestScreenLayout = ({
                         </Text>
                         <Button
                             onPress={() => {
-                                if (visible[2]) {
-                                    updateTaskImages(visible[1])
-                                    setRemovedPhotosIds(prev=>prev.concat(visible[1]))
-                                }
-                                else {
-                                    setImages((prev) =>
-                                        prev.filter(
-                                            (image, imageId) =>
-                                                imageId !== visible[1]
-                                        )
-                                    );
-                                }
+                                setImages((prev) =>
+                                    prev.filter(
+                                        (image, imageId) => imageId !== visible[1]
+                                    )
+                                );
                                 setVisible([false, null]);
                             }}
                             style={{ marginBottom: 15 }}
@@ -133,108 +136,208 @@ const EditRequestScreenLayout = ({
                         </Button>
                     </Card>
                 </Modal>
-                <AutocompleteDropdown
-                    emptyResultText={"Ничего не найдено"}
-                    clearOnFocus={false}
-                    closeOnBlur={true}
-                    closeOnSubmit={false}
-                    initialValue={equipments.find((item) => {
-                        if (
-                            item.title.split(" ")[0] ===
-                            info.taskInfo.equipment.split(" ")[0]
-                        )
-                            return item.id;
-                    })}
-                    onSelectItem={setSelectedItem}
-                    dataSet={equipments}
-                    textInputProps={{
-                        placeholder: "Название оборудования",
-                        autoCorrect: false,
-                        autoCapitalize: "none",
-                        style: {
-                            borderRadius: 5,
-                            borderColor: MAIN_COLOR,
-                            borderWidth: 1,
+                {store.filials !== null &&
+                    <AutocompleteDropdown
+                        initialValue={{
+                            id: store?.filials?.map((obj, id) => ({
+                                id: id.toString(),
+                                title: obj
+                            })).find(filial => filial.title === store.taskInfo.filial).id
+                        }}
+                        loading={store.isFilialsLoading}
+                        emptyResultText={"Ничего не найдено"}
+                        clearOnFocus={false}
+                        closeOnBlur={true}
+                        closeOnSubmit={false}
+                        onSelectItem={(item)=> {
+                            setSelectedFilial(item)
+                            if (item===null){
+                                dispatch(setObjects(null))
+                                dispatch(setEquipments(null))
+                            }
+                        }}
+                        dataSet={store?.filials?.map((filial, id) => ({id: id.toString(), title: filial}))}
+                        textInputProps={{
+                            placeholder: "Филиал",
+                            autoCorrect: false,
+                            autoCapitalize: "none",
+                            style: {
+                                borderRadius: 5,
+                                borderColor: MAIN_COLOR,
+                                borderWidth: 1,
+                                backgroundColor: "#fff",
+                                color: "black",
+                                paddingLeft: 18,
+                                height: 42,
+                            },
+                        }}
+                        rightButtonsContainerStyle={{
                             backgroundColor: "#fff",
-                            color: "black",
-                            paddingLeft: 18,
+                            top: 1,
+                            height: 39,
+                            right: 5,
+                        }}
+                        inputContainerStyle={{
                             height: 42,
-                        },
-                    }}
-                    rightButtonsContainerStyle={{
-                        backgroundColor: "#fff",
-                        top: 1,
-                        height: 39,
-                        right: 5,
-                    }}
-                    inputContainerStyle={{
-                        height: 42,
-                        backgroundColor: "#fff",
-                        marginHorizontal: 15,
-                        marginTop: 15,
-                        borderRadius: 5,
-                    }}
-                    suggestionsListContainerStyle={{
-                        backgroundColor: "#fff",
-                        marginTop: 15,
-                    }}
-                />
+                            backgroundColor: "#fff",
+                            marginHorizontal: 15,
+                            marginTop: 15,
+                            borderRadius: 5,
+                        }}
+                        suggestionsListContainerStyle={{
+                            backgroundColor: "#fff",
+                            marginTop: 15,
+                        }}
+                    />
+                }
+                {(selectedFilial !== null && store?.objects) &&
+                    <AutocompleteDropdown
+                        initialValue={{ id: store?.objects?.map((obj, id)=>({id: id.toString(), title: obj})).find(object=>object.title===store.taskInfo.object)?.id }}
+                        loading={store.isObjectsLoading}
+                        emptyResultText={"Ничего не найдено"}
+                        clearOnFocus={false}
+                        closeOnBlur={true}
+                        closeOnSubmit={false}
+                        onSelectItem={setSelectedObject}
+                        dataSet={store?.objects?.map((obj, id)=>({id: id.toString(), title: obj}))}
+                        textInputProps={{
+                            placeholder: "Объект",
+                            autoCorrect: false,
+                            autoCapitalize: "none",
+                            style: {
+                                borderRadius: 5,
+                                borderColor: MAIN_COLOR,
+                                borderWidth: 1,
+                                backgroundColor: "#fff",
+                                color: "black",
+                                paddingLeft: 18,
+                                height: 42,
+                            },
+                        }}
+                        rightButtonsContainerStyle={{
+                            backgroundColor: "#fff",
+                            top: 1,
+                            height: 39,
+                            right: 5,
+                        }}
+                        inputContainerStyle={{
+                            height: 42,
+                            backgroundColor: "#fff",
+                            marginHorizontal: 15,
+                            marginTop: 15,
+                            borderRadius: 5,
+                        }}
+                        suggestionsListContainerStyle={{
+                            backgroundColor: "#fff",
+                            marginTop: 15,
+                        }}
+                    />
+                }
+                {(selectedFilial !== null && selectedObject !== null && store.equipments !== null) &&
+                    <AutocompleteDropdown
+                        initialValue={(store.taskInfo.object===selectedObject.title) ?
+                            { id: store?.equipments?.map((eq, id)=>({id: id.toString(), title: eq})).find(eq=>eq.title.split("|")[0]===store.taskInfo.equipmentName)?.id }
+                            :
+                            ''
+                        }
+                        loading={store.isEquipmentsLoading}
+                        emptyResultText={"Ничего не найдено"}
+                        clearOnFocus={false}
+                        closeOnBlur={true}
+                        closeOnSubmit={false}
+                        onSelectItem={setSelectedEquipment}
+                        dataSet={store?.equipments?.map((eq, id) => ({id: id.toString(), title: eq}))}
+                        textInputProps={{
+                            placeholder: "Наименование техники/инвентарник",
+                            autoCorrect: false,
+                            autoCapitalize: "none",
+                            style: {
+                                borderRadius: 5,
+                                borderColor: MAIN_COLOR,
+                                borderWidth: 1,
+                                backgroundColor: "#fff",
+                                color: "black",
+                                paddingLeft: 18,
+                                height: 42,
+                            },
+                        }}
+                        rightButtonsContainerStyle={{
+                            backgroundColor: "#fff",
+                            top: 1,
+                            height: 39,
+                            right: 5,
+                        }}
+                        inputContainerStyle={{
+                            height: 42,
+                            backgroundColor: "#fff",
+                            marginHorizontal: 15,
+                            marginTop: 15,
+                            borderRadius: 5,
+                        }}
+                        suggestionsListContainerStyle={{
+                            backgroundColor: "#fff",
+                            marginTop: 15,
+                        }}
+                    />
+                }
                 <Input
                     style={{ marginHorizontal: 15, marginVertical: 15 }}
                     status="primary"
-                    placeholder={info.taskInfo && info.taskInfo.info}
-                    {...titleState}
+                    placeholder="Тема заявки"
+                    {...title}
                 />
                 <Input
                     style={{ marginHorizontal: 15, marginBottom: 15 }}
                     multiline={true}
                     status="primary"
                     textStyle={{ minHeight: 64 }}
-                    placeholder={info.taskInfo && info.taskInfo.description}
-                    {...descriptionState}
+                    placeholder="Описание заявки"
+                    {...description}
                 />
                 <View
                     style={{
                         ...styles.gallery,
-                        height: info.taskInfo.images_ids.length+images.length > 3 ? 200 : 100,
+                        height: images.length > 2 ? 200 : 100,
                     }}
                 >
-                    {info.taskInfo.images_ids.map((id) => {
-                            return (
-                                <TouchableOpacity
-                                    key={id}
-                                    onLongPress={() => {
-                                        setVisible([true, id, 'old']);
-                                    }}
-                                    activeOpacity={0.8}
-                                >
-                                    <Image
-                                        style={styles.tinyLogo}
-                                        source={{
-                                            uri: `http://176.57.217.201:8888/api/accounts/get-image-by-id?id=${id}`,
-                                        }}
-                                    />
-                                </TouchableOpacity>
-                            );
-                    })}
                     {images.map((image, id) => {
-                        if (image)
-                        return (
-                            <TouchableOpacity
-                                key={id}
-                                onLongPress={() => {
-                                    setVisible([true, id]);
-                                }}
-                                activeOpacity={0.8}
-                            >
-                                <Image
-                                    style={styles.tinyLogo}
-                                    source={{
-                                        uri: image.uri,
-                                    }}
-                                />
-                            </TouchableOpacity>
-                        );
+                        if (image) {
+                            if (image.oldPhoto) {
+                                return (
+                                    <TouchableOpacity
+                                        key={image.imageId}
+                                        onLongPress={() => {
+                                            setVisible([true, id, 'old']);
+                                        }}
+                                        activeOpacity={0.8}
+                                    >
+                                        <Image
+                                            style={styles.tinyLogo}
+                                            source={{
+                                                uri: `http://${host}:8000/api/accounts/get-image-by-id?id=${image.imageId}`,
+                                            }}
+                                        />
+                                    </TouchableOpacity>
+                                );
+                            }
+                            else
+                                return (
+                                    <TouchableOpacity
+                                        key={id}
+                                        onLongPress={() => {
+                                            setVisible([true, id]);
+                                        }}
+                                        activeOpacity={0.8}
+                                    >
+                                        <Image
+                                            style={styles.tinyLogo}
+                                            source={{
+                                                uri: image.uri,
+                                            }}
+                                        />
+                                    </TouchableOpacity>
+                                );
+                        }
                     })}
                     <Button
                         style={{
@@ -255,9 +358,25 @@ const EditRequestScreenLayout = ({
                             source={photo}
                         />
                     </Button>
+                    <Button
+                        style={{
+                            height: 80,
+                            width: 80,
+                            marginLeft: 5,
+                            borderRadius: 15,
+                        }}
+                        appearance="outline"
+                        status="primary"
+                        onPress={pickImageHandler}
+                    >
+                        <Avatar
+                            style={{ margin: 8 }}
+                            size="medium"
+                            source={folders}
+                        />
+                    </Button>
                 </View>
-
-                {!info.isCreateTaskLoading ? (
+                {!store.isCreateTaskLoading ? (
                     <Button
                         style={{
                             marginHorizontal: 15,
@@ -266,9 +385,9 @@ const EditRequestScreenLayout = ({
                         }}
                         appearance="outline"
                         status="primary"
-                        onPress={() => saveHandler()}
+                        onPress={() => updateHandler()}
                     >
-                        Сохранить изменения
+                        Сохранить
                     </Button>
                 ) : (
                     <View
@@ -284,39 +403,13 @@ const EditRequestScreenLayout = ({
                         <Spinner size="small" status="primary" />
                     </View>
                 )}
-
             </View>
         );
-    }
 };
-
-const mapDispatchToProps = (dispatch) =>
-    bindActionCreators(
-        {
-            fetchGetTaskInfo,
-            fetchGetImage,
-            updateTaskImages,
-            fetchUpdateTask,
-            setRedirectAfterCreate,
-            fetchGetClientTasks
-        },
-        dispatch
-    );
-
-const mapStateToProps = (state) => {
-    const info = state.reducer;
-    return { info };
-};
-
-export const EditRequestScreen = connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(EditRequestScreenLayout);
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: BACKGROUND_COLOR
     },
     tinyLogo: {
         width: 80,
@@ -338,3 +431,4 @@ const styles = StyleSheet.create({
         flexWrap: "wrap",
     },
 });
+

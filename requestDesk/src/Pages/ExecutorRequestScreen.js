@@ -8,12 +8,10 @@ import {
 import {
     Button,
     Card,
-    Divider,
     Layout,
     Modal,
     Spinner,
     Text,
-    Toggle,
 } from "@ui-kitten/components";
 import { Carousel } from "../Components/Carousel";
 import { useEffect, useState } from "react";
@@ -21,13 +19,13 @@ import * as Clipboard from "expo-clipboard";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import * as React from "react";
-import {fetchGetTaskInfo, fetchUpdateStatus, getComments, sendComment} from "../store/actions";
+import {fetchGetTaskInfo, fetchUpdateStatus, getComments, sendComment, setTaskInfo} from "../store/actions";
 import {ExecutorRequestScreenNavigation} from "../Components/ExecutorRequestScreenNavigation";
 import {Message} from "../Components/Message";
 import {BACKGROUND_COLOR} from "../themes";
-import {AddRequestButton} from "../Components/AddRequestButton";
 import {AddMessageButton} from "../Components/AddMessageButton";
 import {AddMessageModal} from "../Components/AddMessageModal";
+import { GoodJob } from "../../assets/goodJob.gif";
 
 const useToggleState = (initialState = false) => {
     const [checked, setChecked] = useState(initialState);
@@ -44,9 +42,10 @@ const ExecutorRequestScreenLayout = ({
     route,
     navigation,
     fetchGetTaskInfo,
-                                         fetchUpdateStatus,
-                                         sendComment,
-                                         getComments
+     fetchUpdateStatus,
+     sendComment,
+     getComments,
+     setTaskInfo
 }) => {
     const { taskId, otherParam } = route.params;
     useEffect(() => {
@@ -64,11 +63,10 @@ const ExecutorRequestScreenLayout = ({
             getComments(taskId);
         }
     }, [visibleAddMessage])
-    useEffect(()=> {
-        if (info.taskInfo) {
-            warningToggleState.onChange(info.taskInfo.status)
-        }
-    }, [info.taskInfo])
+    const updateStatusHandler = (status) => {
+        fetchUpdateStatus(status, taskId, setIsUpdateStatusLoading)
+        setTaskInfo({...info.taskInfo, status})
+    }
     if (info.isTaskInfoLoading || info.taskInfo === null)
         return (
             <Layout
@@ -112,24 +110,28 @@ const ExecutorRequestScreenLayout = ({
                                 </Button>
                             </Card>
                         </Modal>
-                        <Text style={styles.title} category="h5">
-                            {info.taskInfo.info}
+                        <Text style={styles.obj}>
+                            Филиал: {info.taskInfo.filial}
                         </Text>
-                        <Text style={styles.description} category="h6">
-                            {info.taskInfo.description}
-                        </Text>
-                        <Text style={styles.obj} category="h6">
+                        <Text style={styles.obj}>
                             Объект: {info.taskInfo.object}
                         </Text>
-                        <View
-                            style={{
+                        <Text style={styles.obj}>
+                            Оборудование: {info.taskInfo.equipmentName}
+                        </Text>
+                        <Text style={styles.obj}>
+                            Инвенатрный номер: {info.taskInfo.equipmentInventoryNumber}
+                        </Text>
+                        <Text style={styles.obj}>
+                            Статус: {info.taskInfo.status}
+                        </Text>
+                        <View style={{
                                 display: "flex",
                                 flexDirection: "row",
                                 marginTop: 10,
-                            }}
-                        >
-                            <Text style={styles.obj} category="h6">
-                                Заказчик:{" "}
+                            }}>
+                            <Text style={styles.obj}>
+                                Заказчик:
                             </Text>
                             <Button
                                 size="tiny"
@@ -139,25 +141,27 @@ const ExecutorRequestScreenLayout = ({
                                 {info.taskInfo.client_surname} {info.taskInfo.client_name[0]}. {info.taskInfo.client_second_name[0]}.
                             </Button>
                         </View>
+                        <Text style={styles.obj}>
+                            {info.taskInfo.title}
+                        </Text>
+                        <Text style={styles.obj}>
+                            {info.taskInfo.description}
+                        </Text>
                         <View style={styles.carouselWrapper}>
                             <Carousel ids={info.taskInfo.images_ids}/>
                         </View>
                         <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
                             {isUpdateStatusLoading ?
                                 <View style={{marginTop: 25}}><Spinner status="primary"/></View>
-
                                 :
-                                <Toggle
-                                    style={styles.toggle}
-                                    status="primary"
-                                    onChange={(val) => {
-                                        fetchUpdateStatus(val, taskId, setIsUpdateStatusLoading)
-                                        warningToggleState.onChange(val)
-                                    }}
-                                    checked={warningToggleState.checked}
-                                >
-                                    Отметить как выполненное
-                                </Toggle>}
+                                    info.taskInfo.status==='Создано'?
+                                        <Button style={{marginBottom: 25}} onPress={()=>updateStatusHandler('В работе')}>Принять в работу</Button> :
+                                    info.taskInfo.status==='В работе'?
+                                        <Button style={{marginBottom: 25}} onPress={()=>updateStatusHandler('Выполнено')}>Выполнить</Button> :
+                                        <View style={{marginBottom: 25}}>
+                                            <Text>Заявка закрыта</Text>
+                                        </View>
+                                }
                         </View>
                     </ScrollView>
                     :
@@ -181,7 +185,8 @@ const mapDispatchToProps = (dispatch) =>
             fetchGetTaskInfo,
             fetchUpdateStatus,
             sendComment,
-            getComments
+            getComments,
+            setTaskInfo
         },
         dispatch
     );

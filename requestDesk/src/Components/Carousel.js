@@ -7,6 +7,7 @@ import {
     StyleSheet,
     Dimensions,
 } from "react-native";
+import {host} from "../conf";
 const { width } = Dimensions.get("window");
 const height = width * 0.8;
 
@@ -15,7 +16,7 @@ export const Carousel = ({ ids }) => {
     ids.map((id) => {
         images.push({
             source: {
-                uri: `http://176.57.217.201:8888/api/accounts/get-image-by-id?id=${id}`,
+                uri: `http://${host}:8000/api/accounts/get-image-by-id?id=${id}`,
             },
         });
     });

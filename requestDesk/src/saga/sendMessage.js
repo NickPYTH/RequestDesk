@@ -1,5 +1,6 @@
 import { call, put, takeEvery } from "redux-saga/effects";
 import {FETCH_CREATE_TASK, SEND_COMMENT} from "../store/types";
+import {host} from "../conf";
 
 const request = (
     taskId,
@@ -20,7 +21,7 @@ const request = (
         redirect: "follow",
     };
     return fetch(
-        "http://176.57.217.201:8888/api/accounts/send-comment",
+        `http://${host}:8000/api/accounts/send-comment`,
         requestOptions
     );
 };

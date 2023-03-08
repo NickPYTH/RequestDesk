@@ -69,7 +69,7 @@ export const CameraScreen = ({ route, navigation }) => {
                                             }
                                         ).then((newImage) => {
                                             setImages((prev) => {
-                                                return prev.concat(newImage);
+                                                return prev.concat({...newImage, oldPhoto:false});
                                             });
                                             setIsCameraProcessing(false);
                                         });
@@ -109,7 +109,7 @@ export const CameraScreen = ({ route, navigation }) => {
                         </TouchableOpacity>
                     ) : (
                         <View style={{ alignSelf: "center" }}>
-                            <Spinner size="small" status="warning" />
+                            <Spinner size="small" status="primary" />
                         </View>
                     )}
                 </View>

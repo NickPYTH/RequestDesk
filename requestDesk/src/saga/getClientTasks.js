@@ -1,18 +1,19 @@
 import { call, put, takeEvery } from "redux-saga/effects";
 import { FETCH_GET_CLIENT_TASKS, FETCH_LOGIN } from "../store/types";
 import {
-    isTasksLoading,
+    setIsTasksLoading,
     setClientTaskList,
     setIsClient,
     setIsExecutor,
     setIsLoginLoading,
 } from "../store/actions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {host} from "../conf";
 
-const fetchGetTasks = (phone, email) => {
+const fetchGetTasks = (username, password) => {
     let formData = new FormData();
-    formData.append("phone", phone);
-    formData.append("email", email);
+    formData.append("username", username);
+    formData.append("password", password);
 
     let requestOptions = {
         method: "POST",
@@ -21,24 +22,23 @@ const fetchGetTasks = (phone, email) => {
     };
 
     return fetch(
-        "http://176.57.217.201:8888/api/accounts/get-client-task",
+        `http://${host}:8000/api/accounts/get-client-task`,
         requestOptions
     );
 };
 
 function* getTasksWorker(info) {
-    yield put(setClientTaskList(null));
-    yield put(isTasksLoading(true));
+    yield put(setIsTasksLoading(true));
     const data = yield call(
         fetchGetTasks,
-        info.userInfo.phone,
-        info.userInfo.email
+        info.userInfo.username,
+        info.userInfo.password
     );
     if (data.status === 200) {
         const json = yield call(() => new Promise((res) => res(data.json())));
         yield put(setClientTaskList(json.tasks));
     }
-    yield put(isTasksLoading(false));
+    yield put(setIsTasksLoading(false));
 }
 
 export function* getTasksWatcher() {

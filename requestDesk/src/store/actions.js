@@ -4,10 +4,9 @@ import {
     FETCH_GET_IMAGE,
     FETCH_GET_TASK_INFO,
     FETCH_LOGIN,
-    IS_TASKS_LOADING,
+    SET_IS_TASKS_LOADING,
     LOGOUT,
     SET_CLIENT_TASK_LIST,
-    SET_CREATE_TASK_LOADING,
     SET_IMAGE_IDS,
     SET_IS_CLIENT,
     SET_IS_CREATE_TASK_LOADING,
@@ -21,9 +20,20 @@ import {
     FETCH_UPDATE_TASK,
     UPDATE_TASK_IMAGES,
     SET_TASK_LIST,
-    SET_IS_TASKS_LOADING,
     FETCH_GET_TASKS,
-    FETCH_UPDATE_STATUS, IS_UPDATE_STATUS_LOADING, SEND_COMMENT, GET_COMMENTS, SET_COMMENTS,
+    FETCH_UPDATE_STATUS,
+    IS_UPDATE_STATUS_LOADING,
+    SEND_COMMENT,
+    GET_COMMENTS,
+    SET_COMMENTS,
+    FETCH_GET_FILIALS,
+    SET_IS_FILIALS_LOADING,
+    SET_FILIALS,
+    FETCH_GET_OBJECTS,
+    SET_IS_OBJECTS_LOADING,
+    SET_OBJECTS,
+    FETCH_GET_EQUIPMENTS,
+    SET_IS_EQUIPMENTS_LOADING, SET_EQUIPMENTS, GET_ALL_FILIALS,
 } from "./types";
 
 export const setIsLoadingTaskInfo = (value) => ({
@@ -71,8 +81,8 @@ export const setUserInfo = (info) => ({
     info,
 });
 
-export const isTasksLoading = (value) => ({
-    type: IS_TASKS_LOADING,
+export const setIsTasksLoading = (value) => ({
+    type: SET_IS_TASKS_LOADING,
     value,
 });
 
@@ -103,23 +113,9 @@ export const setImageIds = (id) => ({
     id,
 });
 
-export const fetchCreateTask = (
-    title,
-    description,
-    phone,
-    email,
-    object,
-    equipment,
-    images
-) => ({
+export const fetchCreateTask = (props) => ({
     type: FETCH_CREATE_TASK,
-    title,
-    description,
-    phone,
-    email,
-    object,
-    equipment,
-    images,
+    props
 });
 
 export const setCreateTaskLoading = (value) => ({
@@ -137,9 +133,13 @@ export const updateTaskImages = (remove_id) => ({
     remove_id
 })
 
-export const fetchUpdateTask = (id, title, description, equipment, removed_photos_ids, images) => ({
+export const fetchUpdateTask = (props) => ({
     type: FETCH_UPDATE_TASK,
-    id, title, description, equipment, removed_photos_ids, images
+    props
+})
+
+export const getAllFilials = () => ({
+    type: GET_ALL_FILIALS
 })
 
 export const setTaskList = (tasks) => ({
@@ -174,4 +174,49 @@ export const getComments = (taskId) => ({
 export const setComments = (comments) => ({
     type: SET_COMMENTS,
     comments
+})
+
+export const fetchGetFilials = (username, password) => ({
+    type: FETCH_GET_FILIALS,
+    username, password
+})
+
+export const setIsFilialsLoading = (val) => ({
+    type: SET_IS_FILIALS_LOADING,
+    val
+})
+
+export const setFilials = (filials) => ({
+    type: SET_FILIALS,
+    filials
+})
+
+export const fetchGetObjects = (username, filial) => ({
+    type: FETCH_GET_OBJECTS,
+    username, filial
+})
+
+export const setIsObjectsLoading = (val) => ({
+    type: SET_IS_OBJECTS_LOADING,
+    val
+})
+
+export const setObjects = (objects) => ({
+    type: SET_OBJECTS,
+    objects
+})
+
+export const fetchGetEquipments = (username, filial, object) => ({
+    type: FETCH_GET_EQUIPMENTS,
+    username, filial, object
+})
+
+export const setIsEquipmentsLoading = (val) => ({
+    type: SET_IS_EQUIPMENTS_LOADING,
+    val
+})
+
+export const setEquipments = (equipments) => ({
+    type: SET_EQUIPMENTS,
+    equipments
 })
