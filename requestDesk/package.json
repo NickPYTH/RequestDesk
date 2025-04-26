@@ -16,6 +16,7 @@
     "@react-navigation/native-stack": "^6.6.1",
     "@ui-kitten/components": "^5.1.2",
     "@ui-kitten/eva-icons": "^5.1.2",
+    "eas-cli": "^3.7.2",
     "expo": "^45.0.6",
     "expo-camera": "~12.2.0",
     "expo-clipboard": "~3.0.1",

@@ -83,7 +83,7 @@ const EnterScreenLayout = ({ navigation, info, fetchLogin }) => {
                 >
                     Войти
                 </Button>
-                <Text style={{position: 'absolute', bottom: 0, right: 0, margin: 5, fontSize: 10, opacity: 0.5}}>v1.0.13</Text>
+                <Text style={{position: 'absolute', bottom: 0, right: 0, margin: 5, fontSize: 10, opacity: 0.5}}>v1.0.15</Text>
             </Card>
         </Layout>
     );

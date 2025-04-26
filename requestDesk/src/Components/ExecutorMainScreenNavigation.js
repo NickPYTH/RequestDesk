@@ -16,13 +16,13 @@ export const ExecutorMainScreenNavigation = ({setActivePage, tasks}) => {
         <Icon fill={MAIN_COLOR} ref={completedIconRef} {...props} name='done-all-outline'/>
     );
     const CreatedTitle = () => {
-        return(<Text style={{color: MAIN_COLOR, fontSize: 12}}>Новые {tasks.map(task=>task.status==="Создано").length}</Text>)
+        return(<Text style={{color: MAIN_COLOR, fontSize: 12}}>Новыеv ({tasks ? tasks.filter(task=>task.status==="Создано").length:0})</Text>)
     }
     const InWorkTitle = () => {
-        return(<Text style={{color: MAIN_COLOR, fontSize: 12}}>В работе {tasks.map(task=>task.status==="В работе").length}</Text>)
+        return(<Text style={{color: MAIN_COLOR, fontSize: 12}}>В работе ({tasks ? tasks.filter(task=>task.status==="В работе").length:0})</Text>)
     }
     const CompletedTitle = () => {
-        return(<Text style={{color: MAIN_COLOR, fontSize: 12}}>Выполненые {tasks.map(task=>task.status==="Выполнено").length}</Text>)
+        return(<Text style={{color: MAIN_COLOR, fontSize: 12}}>Выполненые ({tasks ? tasks.filter(task=>task.status==="Выполнено").length:0})</Text>)
     }
     const createdIconRef = React.useRef();
     const inWorkIconRef = React.useRef();

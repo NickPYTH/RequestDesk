@@ -184,7 +184,7 @@ const ExecutorScreenLayout = ({
                 }
                 </>
                 }
-                <ExecutorMainScreenNavigation setActivePage={setActivePage}/>
+                <ExecutorMainScreenNavigation setActivePage={setActivePage} tasks={tasks}/>
             </SafeAreaView>
         );
 };
